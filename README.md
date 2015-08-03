@@ -108,7 +108,7 @@ Filling DEM (2 of 2): 100%
 Operation complete!
 Elapsed time (excluding file I/O): 5.449522954s
 Elapsed time (total): 6.087567077s
-Johns-MacBook-Pro:bin johnlindsay$
+$
 ```
 
 ###Embedding GoSpatial tools
