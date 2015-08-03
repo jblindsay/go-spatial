@@ -77,7 +77,7 @@ Please enter a command: run BreachDepressions
 Enter the DEM file name (incl. file extension):
 ```
 
-When you run a tool from the comman-line interface, you will be guided in terms of the input of the arguments required to run the tool. When you are prompted for an input file name (as in the above example), if the file resides in the current working directory, you can safely omit the directory from the file name. If you would like to print a list of arguments needed to run a particular plugin tool, with descriptions, use the ```toolargs``` command:
+When you run a tool from the command-line interface, you will be guided in terms of the input of the arguments required to run the tool. When you are prompted for an input file name (as in the above example), if the file resides in the current working directory, you can safely omit the directory from the file name. If you would like to print a list of arguments needed to run a particular plugin tool, with descriptions, use the ```toolargs``` command:
 
 ```
 Please enter a command: toolargs breachdepressions
