@@ -96,10 +96,10 @@ SubsequentFilling      bool      Perform post-breach filling?
 Please enter a command:
 ```
 
-This can be helpful when you wish to execute GoSpatial with specified arguments. In the example below, after ```cd```ing to the directory containing the go-spatial executable file, it is possible to run a specific tool, providing arguments for the tool to run:
+This can be helpful when you want to execute a GoSpatial and run a tool by specifying flags and arguments. In the example below, after ```cd```ing to the directory containing the go-spatial executable file, it is possible to run a specific tool (```filldepressions```), providing the arguments for the ```-cwd```, ```-run```, and ```-args``` flags:
 
 ```
-$ ./go-spatial -cwd="/Users/johnlindsay/Documents/Research/FastBreaching/data/" -run="filldepressions" -args="quebec DEM.dep;outputFilledDEM.tif;true"
+$ ./go-spatial -cwd="/Users/jlindsay/data/" -run="filldepressions" -args="my DEM.dep;outputDEM.tif;true"
 *******************
 * filldepressions *
 *******************
@@ -111,7 +111,6 @@ Elapsed time (total): 6.087567077s
 $
 ```
 
-###Embedding GoSpatial tools
 Sometimes you need to call a GoSpatial tool in an automated fashion, rather than using the GoSpatial command-line interface. Here is an example for how to call a GoSpatial tool from a Python script:
 
 ```python
