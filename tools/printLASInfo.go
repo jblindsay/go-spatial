@@ -9,37 +9,39 @@ package tools
 
 import (
 	"bufio"
+	"bytes"
+	"fmt"
 	"os"
 	"strings"
 
-	"github.com/jblindsay/go-spatial/geospatialfiles/raster"
+	"github.com/jblindsay/go-spatial/geospatialfiles/lidar"
 )
 
-type PrintGeoTiffTags struct {
+type PrintLASInfo struct {
 	inputFile   string
 	toolManager *PluginToolManager
 }
 
-func (this *PrintGeoTiffTags) GetName() string {
-	s := "PrintGeoTiffTags"
+func (this *PrintLASInfo) GetName() string {
+	s := "PrintLASInfo"
 	return getFormattedToolName(s)
 }
 
-func (this *PrintGeoTiffTags) GetDescription() string {
-	s := "Prints a GeoTiff's tags"
+func (this *PrintLASInfo) GetDescription() string {
+	s := "Prints details of a LAS file"
 	return getFormattedToolDescription(s)
 }
 
-func (this *PrintGeoTiffTags) GetHelpDocumentation() string {
-	ret := "This tool prints the tags contained within a GeoTIFF file."
+func (this *PrintLASInfo) GetHelpDocumentation() string {
+	ret := "This tool prints the metadata associated with a LAS file."
 	return ret
 }
 
-func (this *PrintGeoTiffTags) SetToolManager(tm *PluginToolManager) {
+func (this *PrintLASInfo) SetToolManager(tm *PluginToolManager) {
 	this.toolManager = tm
 }
 
-func (this *PrintGeoTiffTags) GetArgDescriptions() [][]string {
+func (this *PrintLASInfo) GetArgDescriptions() [][]string {
 	numArgs := 1
 
 	ret := make([][]string, numArgs)
@@ -48,12 +50,12 @@ func (this *PrintGeoTiffTags) GetArgDescriptions() [][]string {
 	}
 	ret[0][0] = "InputFile"
 	ret[0][1] = "string"
-	ret[0][2] = "The input GeoTiff file name"
+	ret[0][2] = "The input LAS file name"
 
 	return ret
 }
 
-func (this *PrintGeoTiffTags) ParseArguments(args []string) {
+func (this *PrintLASInfo) ParseArguments(args []string) {
 	inputFile := args[0]
 	inputFile = strings.TrimSpace(inputFile)
 	if !strings.Contains(inputFile, pathSep) {
@@ -69,7 +71,7 @@ func (this *PrintGeoTiffTags) ParseArguments(args []string) {
 	this.Run()
 }
 
-func (this *PrintGeoTiffTags) CollectArguments() {
+func (this *PrintLASInfo) CollectArguments() {
 	consolereader := bufio.NewReader(os.Stdin)
 
 	// get the input file name
@@ -92,23 +94,18 @@ func (this *PrintGeoTiffTags) CollectArguments() {
 	this.Run()
 }
 
-func (this *PrintGeoTiffTags) Run() {
+func (this *PrintLASInfo) Run() {
 
-	rasterType, err := raster.DetermineRasterFormat(this.inputFile)
-	if rasterType != raster.RT_GeoTiff || err != nil {
-		println("The input file is not of a GeoTIFF format.")
-		return
-	}
-
-	input, err := raster.CreateRasterFromFile(this.inputFile)
+	input, err := lidar.CreateFromFile(this.inputFile)
 	if err != nil {
 		println(err.Error())
 	}
 
-	tagInfo := input.GetMetadataEntries()
-	if len(tagInfo) > 0 {
-		println(tagInfo[0])
-	} else {
-		println("Error reading metadata entries.")
-	}
+	var buffer bytes.Buffer
+
+	buffer.WriteString(fmt.Sprintf("Creation Year: %v\n", input.Header.FileCreationYear))
+	buffer.WriteString(fmt.Sprintf("Number of Points: %v\n", input.Header.NumberPoints))
+	buffer.WriteString(fmt.Sprintf("Generating software: %v\n", input.Header.GeneratingSoftware))
+
+	println(buffer.String())
 }

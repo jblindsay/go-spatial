@@ -9,10 +9,11 @@ package tools
 
 import (
 	"fmt"
-	"gospatial/geospatialfiles/raster"
 	"math"
 	"strconv"
 	"time"
+
+	"github.com/jblindsay/go-spatial/geospatialfiles/raster"
 )
 
 /* This function is only used to benchmark the BreachDepressions tool.

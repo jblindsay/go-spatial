@@ -10,10 +10,11 @@ package tools
 import (
 	"bufio"
 	"fmt"
-	"gospatial/geospatialfiles/raster"
 	"os"
 	"strings"
 	"time"
+
+	"github.com/jblindsay/go-spatial/geospatialfiles/raster"
 )
 
 type FillSmallNodataHoles struct {

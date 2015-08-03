@@ -10,8 +10,6 @@ package tools
 import (
 	"bufio"
 	"fmt"
-	"gospatial/geospatialfiles/raster"
-	"gospatial/structures"
 	"math"
 	"os"
 	"runtime"
@@ -19,6 +17,9 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/jblindsay/go-spatial/geospatialfiles/raster"
+	"github.com/jblindsay/go-spatial/structures"
 )
 
 type FD8FlowAccum struct {

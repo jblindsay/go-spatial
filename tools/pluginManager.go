@@ -28,7 +28,6 @@ type PluginToolManager struct {
 
 func (ptm *PluginToolManager) InitializeTools() {
 	// each new tool needs a two-line entry below
-
 	ptm.mapOfPluginTools = make(map[string]PluginTool)
 
 	wb2gt := new(Whitebox2GeoTiff)
@@ -48,6 +47,9 @@ func (ptm *PluginToolManager) InitializeTools() {
 
 	pgtt := new(PrintGeoTiffTags)
 	ptm.mapOfPluginTools[strings.ToLower(pgtt.GetName())] = pgtt
+
+	pli := new(PrintLASInfo)
+	ptm.mapOfPluginTools[strings.ToLower(pli.GetName())] = pli
 
 	dfm := new(DeviationFromMean)
 	ptm.mapOfPluginTools[strings.ToLower(dfm.GetName())] = dfm

@@ -10,12 +10,13 @@ package tools
 import (
 	"bufio"
 	"fmt"
-	"gospatial/geospatialfiles/raster"
 	"math"
 	"os"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/jblindsay/go-spatial/geospatialfiles/raster"
 )
 
 type D8FlowAccumulation struct {

@@ -10,13 +10,14 @@ package tools
 import (
 	"bufio"
 	"fmt"
-	"gospatial/geospatialfiles/raster"
-	"gospatial/structures"
 	"math"
 	"os"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/jblindsay/go-spatial/geospatialfiles/raster"
+	"github.com/jblindsay/go-spatial/structures"
 )
 
 type BreachStreams struct {

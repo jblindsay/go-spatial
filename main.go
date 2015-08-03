@@ -4,8 +4,6 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
-	"gospatial/geospatialfiles/raster"
-	"gospatial/tools"
 	"os"
 	"os/exec"
 	"runtime"
@@ -13,6 +11,9 @@ import (
 	"strings"
 	"time"
 	"unicode"
+
+	"github.com/jblindsay/go-spatial/geospatialfiles/raster"
+	"github.com/jblindsay/go-spatial/tools"
 )
 
 var layout = "January 02, 2006"

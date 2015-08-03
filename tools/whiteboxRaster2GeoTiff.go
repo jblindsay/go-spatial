@@ -9,9 +9,10 @@ package tools
 
 import (
 	"bufio"
-	"gospatial/geospatialfiles/raster"
 	"os"
 	"strings"
+
+	"github.com/jblindsay/go-spatial/geospatialfiles/raster"
 )
 
 type Whitebox2GeoTiff struct {

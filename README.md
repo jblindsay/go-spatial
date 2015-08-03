@@ -1,6 +1,6 @@
 # GoSpatial
 ##Description
-GoSpatial is a command-line interface program for analyzing and manipulating geospatial data. It has been developed by [John Lindsay](http://www.uoguelph.ca/geography/faculty/lindsay-john "John Lindsay's homepage") using the [Go](https://golang.org "Go programming language homepage") programming language and is compiled to native code. The project is experimental and is intended to provide additional analytical support for the [Whitebox Geospatial Analysis Tools](http://www.uoguelph.ca/~hydrogeo/Whitebox/ "Whitebox GAT homepage") open-source GIS software. GoSpatial can however be run completely independently of any other software.
+GoSpatial is a command-line interface program for analyzing and manipulating geospatial data. It has been developed by [John Lindsay](http://www.uoguelph.ca/geography/faculty/lindsay-john "John Lindsay's homepage") using the [Go](https://golang.org "Go programming language homepage") programming language and is compiled to native code. The project is experimental and is intended to provide additional analytical support for the [Whitebox Geospatial Analysis Tools](http://www.uoguelph.ca/~hydrogeo/Whitebox/ "Whitebox GAT homepage") open-source GIS software. GoSpatial can however be run completely independent of any other software.
 
 ##Install
 To install the GoSpatial source code using the ```go get``` tool within the terminal, simply type:
@@ -9,7 +9,7 @@ To install the GoSpatial source code using the ```go get``` tool within the term
 go get github.com/jblindsay/go-spatial
 ```
 
-You may then build the an executable file using the ```go build``` tool. Pre-compiled versions of the GoSpatial executable will be provided for various supported platforms in the near future and distributed from the [Centre for Hydrogeomatics](http://www.uoguelph.ca/~hydrogeo/software.html "Centre for Hydrogeomatics homepage") homepage.
+You may then build an executable file using the ```go build``` tool. Pre-compiled versions of the GoSpatial executable will be provided for various supported platforms in the near future and distributed from the [Centre for Hydrogeomatics](http://www.uoguelph.ca/~hydrogeo/software.html "Centre for Hydrogeomatics homepage") homepage.
 
 ##Usage
 
@@ -121,10 +121,10 @@ Sometimes you need to call a GoSpatial tool in an automated fashion, rather than
 #! /usr/bin/env python3
 import subprocess
 
-executablestr = "/Users/johnlindsay/Projects/whitebox/bin/gospatial"
-workdir = "/Users/johnlindsay/Documents/Research/FastBreaching/data/"
+executablestr = "/Users/me/Projects/go-spatial"
+workdir = "/Users/me/Documents/data/"
 toolname = "filldepressions"
-args = "quebec DEM.dep;tmp11.dep;true"
+args = "my DEM.dep;outputDEM.tif;true"
 
 a = [executablestr, "-cwd", workdir, "-run", toolname, "-args", args]
 
