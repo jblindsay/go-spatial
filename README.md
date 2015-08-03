@@ -1,11 +1,15 @@
 # GoSpatial
 ##Description
-GoSpatial is a simple command-line interface program for manipulating geospatial data, developed by [John Lindsay](http://www.uoguelph.ca/geography/faculty/lindsay-john "John Lindsay's homepage"). It is developed using the [Go](https://golang.org "Go programming language homepage") programming language and is compiled to native code. The project is experimental and is in its initial stage. GoSpatial is intended to provide additional analytical support for the [Whitebox Geospatial Analysis Tools](http://www.uoguelph.ca/~hydrogeo/Whitebox/ "Whitebox GAT homepage") open-source GIS software.
+GoSpatial is a command-line interface program for analyzing and manipulating geospatial data. It has been developed by [John Lindsay](http://www.uoguelph.ca/geography/faculty/lindsay-john "John Lindsay's homepage") using the [Go](https://golang.org "Go programming language homepage") programming language and is compiled to native code. The project is experimental and is intended to provide additional analytical support for the [Whitebox Geospatial Analysis Tools](http://www.uoguelph.ca/~hydrogeo/Whitebox/ "Whitebox GAT homepage") open-source GIS software.
 
 ##Install
+To install the GoSpatial source code using the ```go get``` tool within the terminal, simply type:
+
 ```
 go get github.com/jblindsay/go-spatial
 ```
+
+You may then build the an executable file using the ```go build``` tool.
 
 ##Usage
 
