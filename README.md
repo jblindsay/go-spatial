@@ -101,7 +101,6 @@ Sometimes you need to call a GoSpatial tool in an automated fashion, rather than
 
 ```python
 #! /usr/bin/env python3
-#from subprocess import call
 import subprocess
 
 executablestr = "/Users/johnlindsay/Projects/whitebox/bin/gospatial"
@@ -111,7 +110,6 @@ args = "quebec DEM.dep;tmp11.dep;true"
 
 a = [executablestr, "-cwd", workdir, "-run", toolname, "-args", args]
 
-#call(a)
 print("Setting up process...")
 p = subprocess.Popen(a)
 print("Running process...")
