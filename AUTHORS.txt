@@ -1,0 +1,5 @@
+Everywhere where the term 'the GoSpatial Authors' is used within the files
+contained within this project, it is taken to refer to the list of developers
+responsible for creating the GoSpatial software. This includes:
+
+Dr. John Lindsay<jlindsay@uoguelph.ca>
