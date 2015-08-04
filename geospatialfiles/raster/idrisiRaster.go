@@ -1,9 +1,9 @@
-// Copyright 2014 the GoSpatial Authors. All rights reserved.
+// Copyright 2015 the GoSpatial Authors. All rights reserved.
 // Use of this source code is governed by an MIT-style
 // licence that can be found in the LICENCE.txt file.
 
 // This file was originally created by John Lindsay<jlindsay@uoguelph.ca>,
-// Nov. 2014.
+// Aug. 2015.
 
 // Package raster provides support for reading and creating various common
 // geospatial raster data formats.
@@ -22,17 +22,17 @@ import (
 	"strings"
 )
 
-// Used to manipulate an Whitebox raster (.dep) file.
-type whiteboxRaster struct {
+// Used to manipulate an Idrisi raster (.rst) file.
+type idrisiRaster struct {
 	dataFile     string
 	data         []float64
-	header       whiteboxRasterHeader
+	header       idrisiRasterHeader
 	minimumValue float64
 	maximumValue float64
 	config       *RasterConfig
 }
 
-func (r *whiteboxRaster) InitializeRaster(fileName string,
+func (r *idrisiRaster) InitializeRaster(fileName string,
 	rows int, columns int, north float64, south float64,
 	east float64, west float64, config *RasterConfig) (err error) {
 	r.config = config
@@ -51,12 +51,12 @@ func (r *whiteboxRaster) InitializeRaster(fileName string,
 	// set the file names; if they exist, delete them
 	// sort out the names of the header and data files
 	ext := strings.ToLower(filepath.Ext(fileName))
-	if ext == ".tas" {
+	if ext == ".rst" {
 		r.dataFile = fileName
-		r.header.fileName = strings.Replace(fileName, ext, ".dep", -1)
-	} else if ext == ".dep" {
+		r.header.fileName = strings.Replace(fileName, ext, ".rdc", -1)
+	} else if ext == ".rdc" {
 		r.header.fileName = fileName
-		r.dataFile = strings.Replace(fileName, ext, ".tas", -1)
+		r.dataFile = strings.Replace(fileName, ext, ".rst", -1)
 	} else {
 		return errors.New("Unrecognized file type.")
 	}
@@ -80,23 +80,23 @@ func (r *whiteboxRaster) InitializeRaster(fileName string,
 	return nil
 }
 
-// Retrieve the data file name (.tas) of this Whitebox raster file.
-func (r *whiteboxRaster) FileName() string {
+// Retrieve the data file name (.rst) of this Idrisi raster file.
+func (r *idrisiRaster) FileName() string {
 	return r.dataFile
 }
 
-// Set the data file name (.tas) of this Whitebox raster file.
-func (r *whiteboxRaster) SetFileName(value string) (err error) {
+// Set the data file name (.rst) of this Idrisi raster file.
+func (r *idrisiRaster) SetFileName(value string) (err error) {
 	r.config = NewDefaultRasterConfig()
 
 	// sort out the names of the header and data files
 	ext := strings.ToLower(filepath.Ext(value))
-	if ext == ".tas" {
+	if ext == ".rst" {
 		r.dataFile = value
-		r.header.fileName = strings.Replace(value, ext, ".dep", -1)
-	} else if ext == ".dep" {
+		r.header.fileName = strings.Replace(value, ext, ".rdc", -1)
+	} else if ext == ".rdc" {
 		r.header.fileName = value
-		r.dataFile = strings.Replace(value, ext, ".tas", -1)
+		r.dataFile = strings.Replace(value, ext, ".rst", -1)
 	} else {
 		return UnsupportedRasterFormatError
 	}
@@ -118,52 +118,52 @@ func (r *whiteboxRaster) SetFileName(value string) (err error) {
 }
 
 // Retrieve the RasterType of this Raster.
-func (r *whiteboxRaster) RasterType() RasterType {
-	return RT_WhiteboxRaster
+func (r *idrisiRaster) RasterType() RasterType {
+	return RT_IdrisiRaster
 }
 
 // Retrieve the number of rows this binary raster file.
-func (r *whiteboxRaster) Rows() int {
+func (r *idrisiRaster) Rows() int {
 	return r.header.rows
 }
 
 // Sets the number of rows of this binary raster file.
-func (r *whiteboxRaster) SetRows(value int) {
+func (r *idrisiRaster) SetRows(value int) {
 	r.header.rows = value
 }
 
 // Retrieve the number of columns of this binary raster file.
-func (r *whiteboxRaster) Columns() int {
+func (r *idrisiRaster) Columns() int {
 	return r.header.columns
 }
 
 // Sets the number of columns of this binary raster file.
-func (r *whiteboxRaster) SetColumns(value int) {
+func (r *idrisiRaster) SetColumns(value int) {
 	r.header.columns = value
 }
 
 // Retrieve the raster's northern edge's coordinate
-func (r *whiteboxRaster) North() float64 {
+func (r *idrisiRaster) North() float64 {
 	return r.header.north
 }
 
 // Retrieve the raster's southern edge's coordinate
-func (r *whiteboxRaster) South() float64 {
+func (r *idrisiRaster) South() float64 {
 	return r.header.south
 }
 
 // Retrieve the raster's eastern edge's coordinate
-func (r *whiteboxRaster) East() float64 {
+func (r *idrisiRaster) East() float64 {
 	return r.header.east
 }
 
 // Retrieve the raster's western edge's coordinate
-func (r *whiteboxRaster) West() float64 {
+func (r *idrisiRaster) West() float64 {
 	return r.header.west
 }
 
 // Retrieve the raster's minimum value
-func (r *whiteboxRaster) MinimumValue() float64 {
+func (r *idrisiRaster) MinimumValue() float64 {
 	if r.minimumValue == math.MaxFloat64 {
 		r.minimumValue, r.maximumValue = r.findMinAndMaxVals()
 	}
@@ -171,14 +171,14 @@ func (r *whiteboxRaster) MinimumValue() float64 {
 }
 
 // Retrieve the raster's minimum value
-func (r *whiteboxRaster) MaximumValue() float64 {
+func (r *idrisiRaster) MaximumValue() float64 {
 	if r.maximumValue == -math.MaxFloat64 {
 		r.minimumValue, r.maximumValue = r.findMinAndMaxVals()
 	}
 	return r.maximumValue
 }
 
-func (r *whiteboxRaster) findMinAndMaxVals() (minVal float64, maxVal float64) {
+func (r *idrisiRaster) findMinAndMaxVals() (minVal float64, maxVal float64) {
 	if r.data != nil && len(r.data) > 0 {
 		minVal = math.MaxFloat64
 		maxVal = -math.MaxFloat64
@@ -199,43 +199,43 @@ func (r *whiteboxRaster) findMinAndMaxVals() (minVal float64, maxVal float64) {
 }
 
 // Sets the raster config
-func (r *whiteboxRaster) SetRasterConfig(value *RasterConfig) {
+func (r *idrisiRaster) SetRasterConfig(value *RasterConfig) {
 	r.config = value
 }
 
 // Retrieves the raster config
-func (r *whiteboxRaster) GetRasterConfig() *RasterConfig {
+func (r *idrisiRaster) GetRasterConfig() *RasterConfig {
 	return r.config
 }
 
 // Retrieve the NoData value used by this binary raster file.
-func (r *whiteboxRaster) NoData() float64 {
+func (r *idrisiRaster) NoData() float64 {
 	return r.header.nodata
 }
 
 // Sets the NoData value used by this binary raster file.
-func (r *whiteboxRaster) SetNoData(value float64) {
+func (r *idrisiRaster) SetNoData(value float64) {
 	r.header.nodata = value
 	r.config.NoDataValue = value
 }
 
 // Retrieve the byte order used by this binary raster file.
-func (r *whiteboxRaster) ByteOrder() binary.ByteOrder {
+func (r *idrisiRaster) ByteOrder() binary.ByteOrder {
 	return r.config.ByteOrder
 }
 
 // Sets the byte order used by this binary raster file.
-func (r *whiteboxRaster) SetByteOrder(value binary.ByteOrder) {
+func (r *idrisiRaster) SetByteOrder(value binary.ByteOrder) {
 	r.config.ByteOrder = value
 }
 
 // Retrieves the metadata for this raster
-func (r *whiteboxRaster) MetadataEntries() []string {
+func (r *idrisiRaster) MetadataEntries() []string {
 	return r.config.MetadataEntries
 }
 
 // Adds a metadata entry to this raster
-func (r *whiteboxRaster) AddMetadataEntry(value string) {
+func (r *idrisiRaster) AddMetadataEntry(value string) {
 	mde := r.config.MetadataEntries
 	newSlice := make([]string, len(mde)+1)
 	for i, val := range mde {
@@ -248,7 +248,7 @@ func (r *whiteboxRaster) AddMetadataEntry(value string) {
 }
 
 // Returns the data as a slice of float64 values
-func (r *whiteboxRaster) Data() ([]float64, error) {
+func (r *idrisiRaster) Data() ([]float64, error) {
 	if len(r.data) == 0 {
 		r.ReadFile()
 	}
@@ -256,7 +256,7 @@ func (r *whiteboxRaster) Data() ([]float64, error) {
 }
 
 // Sets the data from a slice of float64 values
-func (r *whiteboxRaster) SetData(values []float64) {
+func (r *idrisiRaster) SetData(values []float64) {
 	// make sure that the numCells is set
 	if r.header.numCells == 0 {
 		r.header.numCells = r.header.rows * r.header.columns
@@ -269,27 +269,17 @@ func (r *whiteboxRaster) SetData(values []float64) {
 }
 
 // Returns the value within data
-func (r *whiteboxRaster) Value(index int) float64 {
+func (r *idrisiRaster) Value(index int) float64 {
 	return r.data[index]
 }
 
 // Sets the value of index within data
-func (r *whiteboxRaster) SetValue(index int, value float64) {
+func (r *idrisiRaster) SetValue(index int, value float64) {
 	r.data[index] = value
 }
 
-//// Returns the value within ColorData
-//func (r *whiteboxRaster) GetColor(index int) color.Color {
-//	return r.colorData[index]
-//}
-
-//// Sets the value of index within ColorData
-//func (r *whiteboxRaster) SetColor(index int, value color.Color) {
-//	r.colorData[index] = value
-//}
-
 // Save the file
-func (r *whiteboxRaster) Save() (err error) {
+func (r *idrisiRaster) Save() (err error) {
 	// do the files exist? If yes, delete them.
 	if err = r.deleteFiles(); err != nil {
 		return err
@@ -344,7 +334,7 @@ func (r *whiteboxRaster) Save() (err error) {
 }
 
 // Reads the file
-func (r *whiteboxRaster) ReadFile() error {
+func (r *idrisiRaster) ReadFile() error {
 	// read the header file
 	err := r.readHeaderFile()
 	if err != nil {
@@ -391,7 +381,7 @@ func (r *whiteboxRaster) ReadFile() error {
 	return nil
 }
 
-type whiteboxRasterHeader struct {
+type idrisiRasterHeader struct {
 	fileName string
 	rows     int
 	columns  int
@@ -403,10 +393,10 @@ type whiteboxRasterHeader struct {
 	west     float64
 }
 
-func (r *whiteboxRaster) readHeaderFile() error {
+func (r *idrisiRaster) readHeaderFile() error {
 	// read the header file
 	if r.header.fileName == "" {
-		return errors.New("Whitebox GAT raster header file not set properly.")
+		return errors.New("Idrisi raster header file not set properly.")
 	}
 	content, err := ioutil.ReadFile(r.header.fileName)
 	r.check(err)
@@ -414,6 +404,7 @@ func (r *whiteboxRaster) readHeaderFile() error {
 	lines := strings.Split(str, "\n")
 	for a := 0; a < len(lines); a++ {
 		str = strings.ToLower(lines[a])
+		println(str)
 		s := strings.Split(lines[a], "\t")
 		if strings.Contains(str, "min:") && !strings.Contains(str, "display") && !strings.Contains(str, "metadata entry") {
 			r.minimumValue, err = strconv.ParseFloat(s[len(s)-1], 64)
@@ -502,7 +493,7 @@ func (r *whiteboxRaster) readHeaderFile() error {
 	return nil
 }
 
-func (r *whiteboxRaster) writeHeaderFile() (err error) {
+func (r *idrisiRaster) writeHeaderFile() (err error) {
 	f, err := os.Create(r.header.fileName)
 	r.check(err)
 	defer f.Close()
@@ -645,19 +636,19 @@ func (r *whiteboxRaster) writeHeaderFile() (err error) {
 	return nil
 }
 
-func (r *whiteboxRaster) check(e error) {
+func (r *idrisiRaster) check(e error) {
 	if e != nil {
 		panic(e)
 	}
 }
 
-func (h *whiteboxRasterHeader) check(e error) {
+func (h *idrisiRasterHeader) check(e error) {
 	if e != nil {
 		panic(e)
 	}
 }
 
-func (r *whiteboxRaster) deleteFiles() (err error) {
+func (r *idrisiRaster) deleteFiles() (err error) {
 	// do the files exist?
 	if _, err = os.Stat(r.header.fileName); err == nil {
 		if err = os.Remove(r.header.fileName); err != nil {

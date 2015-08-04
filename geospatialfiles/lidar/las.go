@@ -77,6 +77,10 @@ func (las *LasFile) readPointData() {
 
 }
 
+func (las *LasFile) GetFileName() string {
+	return las.fileName
+}
+
 func (las *LasFile) GetPointXYZ(n int64) (X, Y, Z float64) {
 	if las.pointData == nil {
 		las.readPointData()

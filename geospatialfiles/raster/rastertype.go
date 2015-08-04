@@ -28,6 +28,7 @@ const (
 	RT_GrassAsciiRaster
 	RT_SurferAsciiRaster
 	RT_SagaRaster
+	RT_IdrisiRaster
 )
 
 var rasterTypeList = []string{
@@ -39,6 +40,7 @@ var rasterTypeList = []string{
 	"GrassAsciiRaster",
 	"SurferAsciiRaster",
 	"SagaRaster",
+	"IdrisiRaster",
 }
 
 // String returns the English name of the RasterType ("ArcGisBinaryRaster", "ArcGisAsciiRaster", ...).
@@ -56,6 +58,7 @@ func init() {
 	rasterExtensionList = append(rasterExtensionList, []string{".txt"})
 	rasterExtensionList = append(rasterExtensionList, []string{".grd"})
 	rasterExtensionList = append(rasterExtensionList, []string{".sdat", ".sgrd"})
+	rasterExtensionList = append(rasterExtensionList, []string{".rst", ".rdc"})
 }
 
 // Returns a list of the file extensions associated with a particular raster format.

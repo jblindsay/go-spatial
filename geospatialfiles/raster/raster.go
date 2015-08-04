@@ -167,6 +167,9 @@ func CreateNewRaster(fileName string, rows int, columns int, north float64,
 	case RT_GeoTiff:
 		myRasterData = new(geotiffRaster)
 
+	case RT_IdrisiRaster:
+		myRaterData = new(idrisiRaster)
+
 	}
 
 	r.reflectAtBoundaries = myConfig.ReflectAtBoundaries
@@ -253,9 +256,14 @@ func (r *Raster) getRasterData() (rasterData, error) {
 		return myWhiteboxRaster, nil
 
 	case RT_GrassAsciiRaster:
-		myWhiteboxRaster := new(grassAsciiRaster)
-		myWhiteboxRaster.SetFileName(r.FileName)
-		return myWhiteboxRaster, nil
+		myGrassRaster := new(grassAsciiRaster)
+		myGrassRaster.SetFileName(r.FileName)
+		return myGrassRaster, nil
+
+	case RT_IdrisiRaster:
+		myIdrisiRaster := new(idrisiRaster)
+		myIdrisiRaster.SetFileName(r.FileName)
+		return myIdrisiRaster, nil
 	}
 
 	return nil, nil
