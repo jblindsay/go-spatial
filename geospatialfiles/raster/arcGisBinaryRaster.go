@@ -117,6 +117,7 @@ func (r *arcGisBinaryRaster) SetFileName(value string) (err error) {
 
 	r.minimumValue = math.MaxFloat64
 	r.maximumValue = -math.MaxFloat64
+	r.config.RasterFormat = RT_ArcGisBinaryRaster
 
 	return nil
 }

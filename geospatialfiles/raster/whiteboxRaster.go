@@ -47,6 +47,7 @@ func (r *whiteboxRaster) InitializeRaster(fileName string,
 	r.header.west = west
 	r.header.nodata = config.NoDataValue
 	r.config.ByteOrder = config.ByteOrder
+	r.config.RasterFormat = RT_WhiteboxRaster
 
 	// set the file names; if they exist, delete them
 	// sort out the names of the header and data files
@@ -113,6 +114,7 @@ func (r *whiteboxRaster) SetFileName(value string) (err error) {
 
 	r.minimumValue = math.MaxFloat64
 	r.maximumValue = -math.MaxFloat64
+	r.config.RasterFormat = RT_WhiteboxRaster
 
 	return nil
 }

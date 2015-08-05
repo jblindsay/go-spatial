@@ -47,6 +47,7 @@ func (r *idrisiRaster) InitializeRaster(fileName string,
 	r.header.west = west
 	r.header.nodata = config.NoDataValue
 	r.config.ByteOrder = config.ByteOrder
+	r.config.RasterFormat = RT_IdrisiRaster
 
 	// set the file names; if they exist, delete them
 	// sort out the names of the header and data files
@@ -113,6 +114,7 @@ func (r *idrisiRaster) SetFileName(value string) (err error) {
 
 	r.minimumValue = math.MaxFloat64
 	r.maximumValue = -math.MaxFloat64
+	r.config.RasterFormat = RT_IdrisiRaster
 
 	return nil
 }
@@ -297,10 +299,6 @@ func (r *idrisiRaster) Save() (err error) {
 	w := bufio.NewWriter(f)
 	buf := new(bytes.Buffer)
 	switch r.config.DataType {
-	case DT_FLOAT64:
-		if err = binary.Write(buf, r.config.ByteOrder, r.data); err != nil {
-			return FileWritingError
-		}
 	case DT_FLOAT32:
 		out := make([]float32, len(r.data))
 		for i := 0; i < len(r.data); i++ {
@@ -317,14 +315,16 @@ func (r *idrisiRaster) Save() (err error) {
 		if err = binary.Write(buf, r.config.ByteOrder, out); err != nil {
 			return FileWritingError
 		}
-	case DT_INT8:
-		out := make([]int8, len(r.data))
+	case DT_UINT8:
+		out := make([]uint8, len(r.data))
 		for i := 0; i < len(r.data); i++ {
-			out[i] = int8(r.data[i])
+			out[i] = uint8(r.data[i])
 		}
 		if err = binary.Write(buf, r.config.ByteOrder, out); err != nil {
 			return FileWritingError
 		}
+	case DT_RGB24:
+		panic("RGB24 data format is not supported")
 	default:
 		return FileWritingError
 	}
@@ -347,9 +347,6 @@ func (r *idrisiRaster) ReadFile() error {
 	r.header.numCells = r.header.columns * r.header.rows
 	r.data = make([]float64, r.header.numCells)
 	switch r.config.DataType {
-	case DT_FLOAT64:
-		err = binary.Read(buf, r.config.ByteOrder, &r.data)
-		r.check(err)
 	case DT_FLOAT32:
 		nativeData := make([]float32, r.header.numCells)
 		err = binary.Read(buf, r.config.ByteOrder, &nativeData)
@@ -366,14 +363,16 @@ func (r *idrisiRaster) ReadFile() error {
 			r.data[i] = float64(value)
 		}
 		nativeData = nil
-	case DT_INT8:
-		nativeData := make([]int8, r.header.numCells)
+	case DT_UINT8:
+		nativeData := make([]uint8, r.header.numCells)
 		err = binary.Read(buf, r.config.ByteOrder, &nativeData)
 		r.check(err)
 		for i, value := range nativeData {
 			r.data[i] = float64(value)
 		}
 		nativeData = nil
+	case DT_RGB24:
+		panic("The RGB24 data type is not currently supported.")
 	default:
 		return FileReadingError
 	}
@@ -404,87 +403,70 @@ func (r *idrisiRaster) readHeaderFile() error {
 	lines := strings.Split(str, "\n")
 	for a := 0; a < len(lines); a++ {
 		str = strings.ToLower(lines[a])
-		println(str)
-		s := strings.Split(lines[a], "\t")
-		if strings.Contains(str, "min:") && !strings.Contains(str, "display") && !strings.Contains(str, "metadata entry") {
-			r.minimumValue, err = strconv.ParseFloat(s[len(s)-1], 64)
+		//println(str)
+		s := strings.Split(lines[a], ":")
+		if strings.Contains(str, "min. value") && !strings.Contains(str, "lineage") {
+			r.minimumValue, err = strconv.ParseFloat(strings.TrimSpace(s[len(s)-1]), 64)
 			r.check(err)
-		} else if strings.Contains(str, "max:") && !strings.Contains(str, "display") && !strings.Contains(str, "metadata entry") {
-			r.maximumValue, err = strconv.ParseFloat(s[len(s)-1], 64)
+		} else if strings.Contains(str, "max. value") && !strings.Contains(str, "lineage") {
+			r.maximumValue, err = strconv.ParseFloat(strings.TrimSpace(s[len(s)-1]), 64)
 			r.check(err)
-		} else if strings.Contains(str, "display min") && !strings.Contains(str, "metadata entry") {
-			r.config.DisplayMinimum, err = strconv.ParseFloat(s[len(s)-1], 64)
+		} else if strings.Contains(str, "display min") && !strings.Contains(str, "lineage") {
+			r.config.DisplayMinimum, err = strconv.ParseFloat(strings.TrimSpace(s[len(s)-1]), 64)
 			r.check(err)
-		} else if strings.Contains(str, "display max") && !strings.Contains(str, "metadata entry") {
-			r.config.DisplayMaximum, err = strconv.ParseFloat(s[len(s)-1], 64)
+		} else if strings.Contains(str, "display max") && !strings.Contains(str, "lineage") {
+			r.config.DisplayMaximum, err = strconv.ParseFloat(strings.TrimSpace(s[len(s)-1]), 64)
 			r.check(err)
-		} else if strings.Contains(str, "north") && !strings.Contains(str, "metadata entry") {
-			r.header.north, err = strconv.ParseFloat(s[len(s)-1], 64)
+		} else if strings.Contains(str, "max. y") && !strings.Contains(str, "lineage") {
+			r.header.north, err = strconv.ParseFloat(strings.TrimSpace(s[len(s)-1]), 64)
 			r.check(err)
-		} else if strings.Contains(str, "south") && !strings.Contains(str, "metadata entry") {
-			r.header.south, err = strconv.ParseFloat(s[len(s)-1], 64)
+		} else if strings.Contains(str, "min. y") && !strings.Contains(str, "lineage") {
+			r.header.south, err = strconv.ParseFloat(strings.TrimSpace(s[len(s)-1]), 64)
 			r.check(err)
-		} else if strings.Contains(str, "east") && !strings.Contains(str, "metadata entry") {
-			r.header.east, err = strconv.ParseFloat(s[len(s)-1], 64)
+		} else if strings.Contains(str, "max. x") && !strings.Contains(str, "lineage") {
+			r.header.east, err = strconv.ParseFloat(strings.TrimSpace(s[len(s)-1]), 64)
 			r.check(err)
-		} else if strings.Contains(str, "west") && !strings.Contains(str, "metadata entry") {
-			r.header.west, err = strconv.ParseFloat(s[len(s)-1], 64)
+		} else if strings.Contains(str, "min. x") && !strings.Contains(str, "lineage") {
+			r.header.west, err = strconv.ParseFloat(strings.TrimSpace(s[len(s)-1]), 64)
 			r.check(err)
-		} else if strings.Contains(str, "cols") && !strings.Contains(str, "metadata entry") {
-			r.header.columns, err = strconv.Atoi(s[len(s)-1])
+		} else if strings.Contains(str, "columns") && !strings.Contains(str, "lineage") {
+			r.header.columns, err = strconv.Atoi(strings.TrimSpace(s[len(s)-1]))
 			r.check(err)
-		} else if strings.Contains(str, "rows") && !strings.Contains(str, "metadata entry") {
-			r.header.rows, err = strconv.Atoi(s[len(s)-1])
+		} else if strings.Contains(str, "rows") && !strings.Contains(str, "lineage") {
+			r.header.rows, err = strconv.Atoi(strings.TrimSpace(s[len(s)-1]))
 			r.check(err)
-		} else if strings.Contains(str, "stacks") && !strings.Contains(str, "metadata entry") {
-			r.config.NumberOfBands, err = strconv.Atoi(s[len(s)-1])
-			r.check(err)
-		} else if strings.Contains(str, "data type") && !strings.Contains(str, "metadata entry") {
+		} else if strings.Contains(str, "data type") && !strings.Contains(str, "lineage") {
 			dt := strings.ToLower(strings.TrimSpace(s[len(s)-1]))
-			if strings.Contains(dt, "double") {
-				r.config.DataType = DT_FLOAT64
-			} else if strings.Contains(dt, "float") {
+			if strings.Contains(dt, "real") {
 				r.config.DataType = DT_FLOAT32
 			} else if strings.Contains(dt, "int") {
 				r.config.DataType = DT_INT16
-			} else { // byte
-				r.config.DataType = DT_INT8
+			} else if strings.Contains(dt, "byte") {
+				r.config.DataType = DT_UINT8
+			} else if strings.Contains(dt, "rgb24") {
+				r.config.DataType = DT_RGB24
 			}
-		} else if strings.Contains(str, "data scale") && !strings.Contains(str, "metadata entry") {
-			str2 := strings.ToLower(strings.TrimSpace(s[len(s)-1]))
-			if str2 == "continuous" {
-				r.config.PhotometricInterpretation = 0
-			} else if str2 == "categorical" {
-				r.config.PhotometricInterpretation = 1
-			} else if str2 == "bool" {
-				r.config.PhotometricInterpretation = 2
-			} else if str2 == "rgb" {
-				r.config.PhotometricInterpretation = 3
-			} else { // continous is the default
-				r.config.PhotometricInterpretation = 0
-			}
-		} else if strings.Contains(str, "z units") && !strings.Contains(str, "metadata entry") {
+		} else if strings.Contains(str, "value units") && !strings.Contains(str, "lineage") {
 			r.config.ZUnits = strings.ToLower(strings.TrimSpace(s[len(s)-1]))
-		} else if strings.Contains(str, "xy units") && !strings.Contains(str, "metadata entry") {
+		} else if strings.Contains(str, "ref.") && strings.Contains(str, "units") && !strings.Contains(str, "lineage") {
 			r.config.XYUnits = strings.ToLower(strings.TrimSpace(s[len(s)-1]))
-		} else if strings.Contains(str, "projection") && !strings.Contains(str, "metadata entry") {
-			r.config.CoordinateRefSystemWKT = strings.TrimPrefix(lines[a], "Projection:\t")
-		} else if strings.Contains(str, "preferred palette") && !strings.Contains(str, "metadata entry") {
-			r.config.PreferredPalette = strings.ToLower(strings.TrimSpace(s[len(s)-1]))
-		} else if strings.Contains(str, "byteorder") && !strings.Contains(str, "metadata entry") {
+		} else if strings.Contains(str, "ref.") && strings.Contains(str, "system") && !strings.Contains(str, "lineage") {
+			r.config.CoordinateRefSystemWKT = strings.TrimSpace(s[len(s)-1])
+		} else if strings.Contains(str, "byteorder") && !strings.Contains(str, "lineage") {
 			if strings.Contains(strings.ToLower(s[len(s)-1]), "LITTLE_ENDIAN") {
 				r.config.ByteOrder = binary.LittleEndian
 			} else {
 				r.config.ByteOrder = binary.BigEndian
 			}
-		} else if strings.Contains(str, "nodata") && !strings.Contains(str, "metadata entry") {
-			r.header.nodata, err = strconv.ParseFloat(s[len(s)-1], 64)
-			r.check(err)
-		} else if strings.Contains(str, "metadata entry") {
+		} else if strings.Contains(str, "lineage") || strings.Contains(str, "comment") {
 			value := strings.TrimSpace(s[len(s)-1])
 			value = strings.Replace(value, ";", ":", -1)
 			r.AddMetadataEntry(value)
 			//r.config.MetadataEntries = append(r.config.MetadataEntries, value)
+		} else if strings.Contains(str, "file type") && !strings.Contains(str, "lineage") {
+			if !strings.Contains(s[len(s)-1], "binary") || strings.Contains(s[len(s)-1], "packed") {
+				panic("Idrisi ASCII and packed binary files are currently unsupported.")
+			}
 		}
 	}
 
@@ -500,133 +482,115 @@ func (r *idrisiRaster) writeHeaderFile() (err error) {
 	w := bufio.NewWriter(f)
 	var str string
 
-	r.minimumValue, r.maximumValue = r.findMinAndMaxVals()
-
-	str = "Min:\t" + strconv.FormatFloat(r.minimumValue, 'f', -1, 64)
+	str = "file format : IDRISI Raster A.1"
 	_, err = w.WriteString(str + "\n")
 	r.check(err)
 
-	str = "Max:\t" + strconv.FormatFloat(r.maximumValue, 'f', -1, 64)
-	_, err = w.WriteString(str + "\n")
-	r.check(err)
-
-	str = "North:\t" + strconv.FormatFloat(r.header.north, 'f', -1, 64)
-	_, err = w.WriteString(str + "\n")
-	r.check(err)
-
-	str = "South:\t" + strconv.FormatFloat(r.header.south, 'f', -1, 64)
-	_, err = w.WriteString(str + "\n")
-	r.check(err)
-
-	str = "East:\t" + strconv.FormatFloat(r.header.east, 'f', -1, 64)
-	_, err = w.WriteString(str + "\n")
-	r.check(err)
-
-	str = "West:\t" + strconv.FormatFloat(r.header.west, 'f', -1, 64)
-	_, err = w.WriteString(str + "\n")
-	r.check(err)
-
-	str = "Cols:\t" + strconv.Itoa(r.header.columns)
-	_, err = w.WriteString(str + "\n")
-	r.check(err)
-
-	str = "Rows:\t" + strconv.Itoa(r.header.rows)
-	_, err = w.WriteString(str + "\n")
-	r.check(err)
-
-	str = "Stacks:\t" + strconv.Itoa(r.config.NumberOfBands)
+	str = "file title  : "
 	_, err = w.WriteString(str + "\n")
 	r.check(err)
 
 	switch r.config.DataType {
-	case DT_FLOAT64:
-		str = "Data Type:\tDOUBLE"
+	case DT_FLOAT32:
+		str = "data type   : real"
 	case DT_INT16:
-		str = "Data Type:\tINTEGER"
-	case DT_INT8:
-		str = "Data Type:\tBYTE"
-	default:
-		str = "Data Type:\tFLOAT"
+		str = "data type   : integer"
+	case DT_UINT8:
+		str = "data type   : byte"
+	case DT_RGB24:
+		str = "data type   : RGB24"
 	}
-
 	_, err = w.WriteString(str + "\n")
 	r.check(err)
 
-	str = "Z Units:\t" + r.config.ZUnits
+	str = "file type   : binary"
 	_, err = w.WriteString(str + "\n")
 	r.check(err)
 
-	str = "XY Units:\t" + r.config.XYUnits
+	str = "columns     : " + strconv.Itoa(r.header.columns)
 	_, err = w.WriteString(str + "\n")
 	r.check(err)
 
-	if r.config.CoordinateRefSystemWKT == "" {
-		r.config.CoordinateRefSystemWKT = "not specified"
-	}
-	str = "Projection:\t" + r.config.CoordinateRefSystemWKT
+	str = "rows        : " + strconv.Itoa(r.header.rows)
 	_, err = w.WriteString(str + "\n")
 	r.check(err)
 
-	switch r.config.PhotometricInterpretation {
-	case 0:
-		str = "Data Scale:\tcontinuous"
-		_, err = w.WriteString(str + "\n")
-		r.check(err)
-	case 1:
-		str = "Data Scale:\tcategorical"
-		_, err = w.WriteString(str + "\n")
-		r.check(err)
-	case 2:
-		str = "Data Scale:\tboolean"
-		_, err = w.WriteString(str + "\n")
-		r.check(err)
-	case 3:
-		str = "Data Scale:\trgb"
-		_, err = w.WriteString(str + "\n")
-		r.check(err)
-	}
-
-	if r.config.DisplayMinimum == math.MaxFloat64 {
-		r.config.DisplayMinimum = r.minimumValue
-	}
-	str = "Display Min:\t" + strconv.FormatFloat(r.config.DisplayMinimum, 'f', -1, 64)
+	str = "ref. system : " + r.config.CoordinateRefSystemWKT
 	_, err = w.WriteString(str + "\n")
 	r.check(err)
 
-	if r.config.DisplayMaximum == -math.MaxFloat64 {
-		r.config.DisplayMaximum = r.maximumValue
-	}
-	str = "Display Max:\t" + strconv.FormatFloat(r.config.DisplayMaximum, 'f', -1, 64)
+	str = "ref. units  : " + r.config.XYUnits
 	_, err = w.WriteString(str + "\n")
 	r.check(err)
 
-	if r.config.PreferredPalette == "not specified" {
-		r.config.PreferredPalette = "grey.pal"
-	}
-	str = "Preferred Palette:\t" + r.config.PreferredPalette
+	str = "unit dist.  : 1.0000000"
 	_, err = w.WriteString(str + "\n")
 	r.check(err)
 
-	str = "NoData:\t" + strconv.FormatFloat(r.header.nodata, 'f', -1, 64)
+	str = "min. X      : " + strconv.FormatFloat(r.header.west, 'f', -1, 64)
 	_, err = w.WriteString(str + "\n")
 	r.check(err)
-	if r.config.ByteOrder == binary.LittleEndian {
-		str = "Byte Order:\tLITTLE_ENDIAN"
-		_, err = w.WriteString(str + "\n")
-		r.check(err)
-	} else {
-		str = "Byte Order:\tBIG_ENDIAN"
-		_, err = w.WriteString(str + "\n")
-		r.check(err)
-	}
-	str = "Palette Nonlinearity:\t" + strconv.FormatFloat(r.config.PaletteNonlinearity, 'f', -1, 64)
+
+	str = "max. X      : " + strconv.FormatFloat(r.header.east, 'f', -1, 64)
+	_, err = w.WriteString(str + "\n")
+	r.check(err)
+
+	str = "min. Y      : " + strconv.FormatFloat(r.header.south, 'f', -1, 64)
+	_, err = w.WriteString(str + "\n")
+	r.check(err)
+
+	str = "max. Y      : " + strconv.FormatFloat(r.header.north, 'f', -1, 64)
+	_, err = w.WriteString(str + "\n")
+	r.check(err)
+
+	str = "pos'n error : unknown"
+	_, err = w.WriteString(str + "\n")
+	r.check(err)
+
+	str = "resolution  : unknown"
+	_, err = w.WriteString(str + "\n")
+	r.check(err)
+
+	str = "min. value  : " + strconv.FormatFloat(r.minimumValue, 'f', -1, 64)
+	_, err = w.WriteString(str + "\n")
+	r.check(err)
+
+	str = "max. value  : " + strconv.FormatFloat(r.maximumValue, 'f', -1, 64)
+	_, err = w.WriteString(str + "\n")
+	r.check(err)
+
+	str = "display min : " + strconv.FormatFloat(r.config.DisplayMinimum, 'f', -1, 64)
+	_, err = w.WriteString(str + "\n")
+	r.check(err)
+
+	str = "display max : " + strconv.FormatFloat(r.config.DisplayMaximum, 'f', -1, 64)
+	_, err = w.WriteString(str + "\n")
+	r.check(err)
+
+	str = "value units : " + r.config.ZUnits
+	_, err = w.WriteString(str + "\n")
+	r.check(err)
+
+	str = "value error : unknown"
+	_, err = w.WriteString(str + "\n")
+	r.check(err)
+
+	str = "flag value  : " + "none"
+	_, err = w.WriteString(str + "\n")
+	r.check(err)
+
+	str = "flag def'n  : " + "none"
+	_, err = w.WriteString(str + "\n")
+	r.check(err)
+
+	str = "legend cats : 0"
 	_, err = w.WriteString(str + "\n")
 	r.check(err)
 
 	// write the metadata entries
 	for _, value := range r.config.MetadataEntries {
 		if len(strings.TrimSpace(value)) > 0 {
-			str = "Metadata Entry:\t" + strings.Replace(value, ":", ";", -1)
+			str = "comment     : " + strings.Replace(value, ":", ";", -1)
 			_, err = w.WriteString(str + "\n")
 			r.check(err)
 		}

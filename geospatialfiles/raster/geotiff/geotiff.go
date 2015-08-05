@@ -14,7 +14,7 @@ import (
 	"sort"
 	"strings"
 
-	"gospatial/geospatialfiles/raster/geotiff/lzw"
+	"github.com/jblindsay/go-spatial/geospatialfiles/raster/geotiff/lzw"
 )
 
 var println = fmt.Println

@@ -10,8 +10,11 @@
 package raster
 
 import (
+	"bytes"
 	"encoding/binary"
+	"fmt"
 	"math"
+	"reflect"
 
 	"path/filepath"
 	"strings"
@@ -81,6 +84,19 @@ type RasterConfig struct {
 	ReflectAtBoundaries       bool
 	PixelIsArea               bool
 	EPSGCode                  int
+}
+
+func (h RasterConfig) String() string {
+	var buffer bytes.Buffer
+	buffer.WriteString("Raster Configuration:\n")
+	s := reflect.ValueOf(&h).Elem()
+	typeOfT := s.Type()
+	for i := 0; i < s.NumField(); i++ {
+		f := s.Field(i)
+		str := fmt.Sprintf("%s %s = %v\n", typeOfT.Field(i).Name, f.Type(), f.Interface())
+		buffer.WriteString(str)
+	}
+	return buffer.String()
 }
 
 func NewDefaultRasterConfig() *RasterConfig {
@@ -168,7 +184,7 @@ func CreateNewRaster(fileName string, rows int, columns int, north float64,
 		myRasterData = new(geotiffRaster)
 
 	case RT_IdrisiRaster:
-		myRaterData = new(idrisiRaster)
+		myRasterData = new(idrisiRaster)
 
 	}
 

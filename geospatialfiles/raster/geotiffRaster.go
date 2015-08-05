@@ -12,11 +12,12 @@ package raster
 import (
 	"encoding/binary"
 	"errors"
-	"gospatial/geospatialfiles/raster/geotiff"
 	"math"
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/jblindsay/go-spatial/geospatialfiles/raster/geotiff"
 )
 
 // Used to manipulate an ArcGIS ASCII raster file.
@@ -148,6 +149,7 @@ func (r *geotiffRaster) SetFileName(value string) (err error) {
 
 	r.minimumValue = math.MaxFloat64
 	r.maximumValue = -math.MaxFloat64
+	r.config.RasterFormat = RT_GeoTiff
 
 	//r.gt = geotiff.GeoTIFF{}
 	return nil

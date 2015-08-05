@@ -90,6 +90,7 @@ func (r *arcGisAsciiRaster) SetFileName(value string) (err error) {
 
 	r.minimumValue = math.MaxFloat64
 	r.maximumValue = -math.MaxFloat64
+	r.config.RasterFormat = RT_ArcGisAsciiRaster
 
 	return nil
 }

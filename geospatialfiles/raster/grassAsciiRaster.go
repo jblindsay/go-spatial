@@ -89,6 +89,7 @@ func (r *grassAsciiRaster) SetFileName(value string) (err error) {
 
 	r.minimumValue = math.MaxFloat64
 	r.maximumValue = -math.MaxFloat64
+	r.config.RasterFormat = RT_GrassAsciiRaster
 
 	return nil
 }
@@ -184,22 +185,22 @@ func (r *grassAsciiRaster) GetRasterConfig() *RasterConfig {
 	return r.config
 }
 
-// Retrieve the NoData value used by this ArcGIS binary raster file.
+// Retrieve the NoData value used by this GRASS raster file.
 func (r *grassAsciiRaster) NoData() float64 {
 	return r.header.nodata
 }
 
-// Sets the NoData value used by this ArcGIS binary raster file.
+// Sets the NoData value used by this GRASS raster file.
 func (r *grassAsciiRaster) SetNoData(value float64) {
 	r.header.nodata = value
 }
 
-// Retrieve the byte order used by this ArcGIS binary raster file.
+// Retrieve the byte order used by this GRASS raster file.
 func (r *grassAsciiRaster) ByteOrder() binary.ByteOrder {
 	return nil
 }
 
-// Sets the byte order used by this ArcGIS binary raster file.
+// Sets the byte order used by this GRASS raster file.
 func (r *grassAsciiRaster) SetByteOrder(value binary.ByteOrder) {
 	// Do nothing, there is no byte order for ASCII file formats
 	// This method is simply present to satisfy the RasterData interface
