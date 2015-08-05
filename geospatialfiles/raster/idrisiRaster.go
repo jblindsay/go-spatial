@@ -393,6 +393,7 @@ type idrisiRasterHeader struct {
 }
 
 func (r *idrisiRaster) readHeaderFile() error {
+	r.header.nodata = -math.MaxFloat64
 	// read the header file
 	if r.header.fileName == "" {
 		return errors.New("Idrisi raster header file not set properly.")
@@ -482,6 +483,8 @@ func (r *idrisiRaster) writeHeaderFile() (err error) {
 	w := bufio.NewWriter(f)
 	var str string
 
+	r.minimumValue, r.maximumValue = r.findMinAndMaxVals()
+
 	str = "file format : IDRISI Raster A.1"
 	_, err = w.WriteString(str + "\n")
 	r.check(err)
@@ -559,10 +562,16 @@ func (r *idrisiRaster) writeHeaderFile() (err error) {
 	_, err = w.WriteString(str + "\n")
 	r.check(err)
 
+	if r.config.DisplayMinimum == math.MaxFloat64 {
+		r.config.DisplayMinimum = r.minimumValue
+	}
 	str = "display min : " + strconv.FormatFloat(r.config.DisplayMinimum, 'f', -1, 64)
 	_, err = w.WriteString(str + "\n")
 	r.check(err)
 
+	if r.config.DisplayMaximum == -math.MaxFloat64 {
+		r.config.DisplayMaximum = r.maximumValue
+	}
 	str = "display max : " + strconv.FormatFloat(r.config.DisplayMaximum, 'f', -1, 64)
 	_, err = w.WriteString(str + "\n")
 	r.check(err)

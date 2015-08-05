@@ -13,6 +13,7 @@ func (g GeoTiffTag) String() string {
 
 // Tags (see p. 28-41 of the spec).
 var tagMap = map[int]GeoTiffTag{
+	254: GeoTiffTag{"NewSubFileType", 254},
 	256: GeoTiffTag{"ImageWidth", 256},
 	257: GeoTiffTag{"ImageLength", 257},
 	258: GeoTiffTag{"BitsPerSample", 258},
@@ -102,4 +103,5 @@ var tagMap = map[int]GeoTiffTag{
 	4098:  GeoTiffTag{"VerticalDatumGeoKey", 4098},
 	4099:  GeoTiffTag{"VerticalUnitsGeoKey", 4099},
 	50844: GeoTiffTag{"RPCCoefficientTag", 50844},
+	34377: GeoTiffTag{"Photoshop", 34377},
 }

@@ -46,6 +46,7 @@ var lengths = [...]uint32{0, 1, 1, 2, 4, 8, 1, 2, 2, 4, 8, 8, 16}
 
 // Tags (see p. 28-41 of the spec).
 const (
+	tNewSubfileType            = 254
 	tImageWidth                = 256
 	tImageLength               = 257
 	tBitsPerSample             = 258
@@ -132,6 +133,8 @@ const (
 	tVerticalCitationGeoKey         = 4097
 	tVerticalDatumGeoKey            = 4098
 	tVerticalUnitsGeoKey            = 4099
+
+	tPhotoshop = 34377
 )
 
 // imageMode represents the mode of the image.
