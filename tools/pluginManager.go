@@ -30,6 +30,15 @@ func (ptm *PluginToolManager) InitializeTools() {
 	// each new tool needs a two-line entry below
 	ptm.mapOfPluginTools = make(map[string]PluginTool)
 
+	hillshade := new(Hillshade)
+	ptm.mapOfPluginTools[strings.ToLower(hillshade.GetName())] = hillshade
+
+	aspect := new(Aspect)
+	ptm.mapOfPluginTools[strings.ToLower(aspect.GetName())] = aspect
+
+	slope := new(Slope)
+	ptm.mapOfPluginTools[strings.ToLower(slope.GetName())] = slope
+
 	wb2gt := new(Whitebox2GeoTiff)
 	ptm.mapOfPluginTools[strings.ToLower(wb2gt.GetName())] = wb2gt
 

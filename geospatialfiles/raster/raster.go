@@ -327,6 +327,18 @@ func (r *Raster) SetValue(row, column int, value float64) {
 	}
 }
 
+// Sets an a row of pixel value in the grid.
+func (r *Raster) SetRowValues(row int, values []float64) {
+	// does values have the length of columns?
+	if len(values) == r.Columns {
+		for column, value := range values {
+			// what is the cell number?
+			cellNum := row*r.Columns + column
+			r.rd.SetValue(cellNum, value)
+		}
+	}
+}
+
 // Returns the data as a slice of float64 values
 func (r *Raster) Data() ([]float64, error) {
 	return r.rd.Data()
@@ -386,10 +398,41 @@ func (r *Raster) GetCellSizeY() (cellSizeY float64) {
 	return cellSizeY
 }
 
+func (r *Raster) SetDisplayMinimum(value float64) {
+	config := r.rd.GetRasterConfig()
+	config.DisplayMinimum = value
+}
+
+func (r *Raster) SetDisplayMaximum(value float64) {
+	config := r.rd.GetRasterConfig()
+	config.DisplayMaximum = value
+}
+
 func (r *Raster) check(e error) {
 	if e != nil {
 		panic(e)
 	}
+}
+
+func (r *Raster) IsInGeographicCoordinates() bool {
+	/* This is really hard because none of the supported raster types use the
+	 method of handling coordinate reference systems. This is really just a
+	stop-gap measure for now.
+	*/
+	config := r.GetRasterConfig()
+
+	epsg := config.EPSGCode
+	if epsg == 4322 || epsg == 4326 || epsg == 4629 || epsg == 4277 {
+		return true
+	}
+	wkt := strings.ToLower(config.CoordinateRefSystemWKT)
+	if !strings.Contains(wkt, "projcs[") {
+		return true
+	}
+	if strings.Contains(strings.ToLower(config.XYUnits), "deg") {
+		return true
+	}
+	return false
 }
 
 // set's the Raster's public variables based on a RasterData
