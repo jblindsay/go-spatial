@@ -670,15 +670,14 @@ func newFD8Queue() *fd8Queue {
 
 //	Returns the number of elements in the queue (i.e. size/length)
 func (q *fd8Queue) len() int {
-	q.Lock()
-	defer q.Unlock()
+	//	q.Lock()
+	//	defer q.Unlock()
 	return q.count
 }
 
 //	Pushes/inserts a value at the end/tail of the queue.
 func (q *fd8Queue) push(row, column int) {
 	q.Lock()
-	defer q.Unlock()
 	n := &gridnode{row: row, column: column}
 
 	if q.count > 0 {
@@ -689,13 +688,13 @@ func (q *fd8Queue) push(row, column int) {
 		q.head = n
 	}
 	q.count++
+	q.Unlock()
 }
 
 //	Returns the value at the front of the queue.
 //	i.e. the oldest value in the queue.
 func (q *fd8Queue) pop() (int, int) {
 	q.Lock()
-	defer q.Unlock()
 	n := q.head
 	q.head = n.next
 
@@ -703,7 +702,7 @@ func (q *fd8Queue) pop() (int, int) {
 		q.tail = nil
 	}
 	q.count--
-
+	q.Unlock()
 	return n.row, n.column
 }
 
