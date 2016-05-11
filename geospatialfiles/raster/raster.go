@@ -147,7 +147,7 @@ func CreateNewRaster(fileName string, rows int, columns int, north float64,
 	if len(config) == 0 {
 		myConfig = NewDefaultRasterConfig()
 	} else {
-		// obviously, more than one config could be specified because of
+		// More than one config could be specified because of
 		// the use of the variadic parameter, which is done so that it
 		// is possible to specify no config. If more than one config is
 		// specified, only the last is used.
@@ -172,7 +172,7 @@ func CreateNewRaster(fileName string, rows int, columns int, north float64,
 		myRasterData = new(arcGisBinaryRaster)
 
 	case RT_ArcGisAsciiRaster:
-		myRasterData = new(arcGisAsciiRaster)
+		myRasterData = new(arcGisASCIIRaster)
 
 	case RT_WhiteboxRaster:
 		myRasterData = new(whiteboxRaster)
@@ -262,7 +262,7 @@ func (r *Raster) getRasterData() (rasterData, error) {
 		return myArcRaster, nil
 
 	case RT_ArcGisAsciiRaster:
-		myArcRaster := new(arcGisAsciiRaster)
+		myArcRaster := new(arcGisASCIIRaster)
 		myArcRaster.SetFileName(r.FileName)
 		return myArcRaster, nil
 

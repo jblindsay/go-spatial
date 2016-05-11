@@ -78,9 +78,9 @@ func (las *LasFile) readHeader() {
 
 	offset := 111
 	var numReturns int
-	if las.Header.VersionMajor == 1 && (las.Header.VersionMinor < 3) {
+	if las.Header.VersionMajor == 1 && (las.Header.VersionMinor <= 3) {
 		numReturns = 5
-	} else if las.Header.VersionMajor == 1 && las.Header.VersionMinor == 3 {
+	} else if las.Header.VersionMajor == 1 && las.Header.VersionMinor > 3 {
 		numReturns = 7
 	} else {
 		panic(errors.New("Unsupported LAS file type"))

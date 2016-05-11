@@ -186,7 +186,7 @@ func (this *Aspect) Run() {
 	printf("\rProgress: %v%%", 0)
 	//var numSolvedCells int = 0
 	startingRow := 0
-	var rowBlockSize int = rows / numCPUs
+	rowBlockSize := rows / numCPUs
 
 	k := 0
 	for startingRow < rows {

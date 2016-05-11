@@ -6,6 +6,7 @@ var testFD8FA = false
 var testDevFromMean = false
 var testDevFromMeanTraditional = false
 var testBreachStreams = false
+var testWhiteboxRaster2GeoTiff = true
 
 func TestFD8FA(t *testing.T) {
 	if testFD8FA {
@@ -59,6 +60,20 @@ func TestBreachStreams(t *testing.T) {
 		args[2] = "/Users/johnlindsay/Documents/Data/SouthernOnt/tmp8.dep"
 
 		bs.ParseArguments(args)
+	} else {
+		t.SkipNow()
+	}
+}
+
+func TestWhiteboxRaster2GeoTiff(t *testing.T) {
+	if testWhiteboxRaster2GeoTiff {
+		w2g := Whitebox2GeoTiff{}
+		args := make([]string, 2)
+		args[0] = "/Users/johnlindsay/Documents/Data/SouthernOnt/colour comp.dep"
+		args[1] = "/Users/johnlindsay/Documents/Data/SouthernOnt/deleteMe2.tif"
+
+		w2g.ParseArguments(args)
+		println("Hello goofball")
 	} else {
 		t.SkipNow()
 	}

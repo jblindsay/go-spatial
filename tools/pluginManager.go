@@ -15,17 +15,19 @@ import (
 	"strings"
 )
 
-var println = fmt.Println
+//var println = fmt.Println
 var printf = fmt.Printf
 var print = fmt.Print
-var pathSep string = string(os.PathSeparator)
+var pathSep = string(os.PathSeparator)
 
+// PluginToolManager is an object for managing plugin tools.
 type PluginToolManager struct {
 	workingDirectory string
 	mapOfPluginTools map[string]PluginTool
 	BenchMode        bool
 }
 
+// InitializeTools is a method for initializing a new plugin tool manager.
 func (ptm *PluginToolManager) InitializeTools() {
 	// each new tool needs a two-line entry below
 	ptm.mapOfPluginTools = make(map[string]PluginTool)
@@ -96,9 +98,8 @@ func (ptm *PluginToolManager) Run(toolName string) error {
 		tool.CollectArguments()
 		runtime.GC()
 		return nil
-	} else {
-		return errors.New("Unrecognized tool name. Type 'listtools' for a list of available tools.\n")
 	}
+	return errors.New("Unrecognized tool name. Type 'listtools' for a list of available tools.\n")
 }
 
 func (ptm *PluginToolManager) RunWithArguments(toolName string, args []string) error {
@@ -110,9 +111,8 @@ func (ptm *PluginToolManager) RunWithArguments(toolName string, args []string) e
 		tool.ParseArguments(args)
 		runtime.GC()
 		return nil
-	} else {
-		return errors.New("Unrecognized tool name. Type 'listtools' for a list of available tools.\n")
 	}
+	return errors.New("Unrecognized tool name. Type 'listtools' for a list of available tools.\n")
 }
 
 func (ptm *PluginToolManager) GetToolArgDescriptions(toolName string) ([]string, error) {
@@ -148,9 +148,8 @@ func (ptm *PluginToolManager) GetToolArgDescriptions(toolName string) ([]string,
 			ret[i] = trailingSpaces(val[0], lenToolName) + trailingSpaces(val[1], lenDataType) + val[2]
 		}
 		return ret, nil
-	} else {
-		return nil, errors.New("Unrecognized tool name. Type 'listtools' for a list of available tools.\n")
 	}
+	return nil, errors.New("Unrecognized tool name. Type 'listtools' for a list of available tools.\n")
 }
 
 func (ptm *PluginToolManager) SetWorkingDirectory(wd string) {
@@ -221,7 +220,6 @@ func (ptm *PluginToolManager) GetToolHelp(toolName string) (string, error) {
 	if tool, ok := ptm.mapOfPluginTools[toolName]; ok {
 		//showToolHelp(tool)
 		return tool.GetHelpDocumentation(), nil
-	} else {
-		return "", errors.New("Unrecognized tool name. Type 'listtools' for a list of available tools.\n")
 	}
+	return "", errors.New("Unrecognized tool name. Type 'listtools' for a list of available tools.\n")
 }

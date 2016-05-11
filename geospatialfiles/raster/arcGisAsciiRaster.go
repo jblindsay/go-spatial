@@ -19,16 +19,16 @@ import (
 )
 
 // Used to manipulate an ArcGIS ASCII raster file.
-type arcGisAsciiRaster struct {
+type arcGisASCIIRaster struct {
 	fileName     string
 	data         []float64
-	header       arcGisAsciiRasterHeader
+	header       arcGisASCIIRasterHeader
 	minimumValue float64
 	maximumValue float64
 	config       *RasterConfig
 }
 
-func (r *arcGisAsciiRaster) InitializeRaster(fileName string,
+func (r *arcGisASCIIRaster) InitializeRaster(fileName string,
 	rows int, columns int, north float64, south float64,
 	east float64, west float64, config *RasterConfig) (err error) {
 
@@ -69,12 +69,12 @@ func (r *arcGisAsciiRaster) InitializeRaster(fileName string,
 }
 
 // Retrieve the file name of this ArcGIS ASCII raster file.
-func (r *arcGisAsciiRaster) FileName() string {
+func (r *arcGisASCIIRaster) FileName() string {
 	return r.fileName
 }
 
 // Set the file name of this ArcGIS ASCII raster file.
-func (r *arcGisAsciiRaster) SetFileName(value string) (err error) {
+func (r *arcGisASCIIRaster) SetFileName(value string) (err error) {
 	r.config = NewDefaultRasterConfig()
 
 	r.fileName = value
@@ -96,52 +96,52 @@ func (r *arcGisAsciiRaster) SetFileName(value string) (err error) {
 }
 
 // Retrieve the RasterType of this Raster.
-func (r *arcGisAsciiRaster) RasterType() RasterType {
+func (r *arcGisASCIIRaster) RasterType() RasterType {
 	return RT_ArcGisAsciiRaster
 }
 
 // Retrieve the number of rows this ArcGIS binary raster file.
-func (r *arcGisAsciiRaster) Rows() int {
+func (r *arcGisASCIIRaster) Rows() int {
 	return r.header.rows
 }
 
 // Sets the number of rows of this ArcGIS binary raster file.
-func (r *arcGisAsciiRaster) SetRows(value int) {
+func (r *arcGisASCIIRaster) SetRows(value int) {
 	r.header.rows = value
 }
 
 // Retrieve the number of columns of this ArcGIS binary raster file.
-func (r *arcGisAsciiRaster) Columns() int {
+func (r *arcGisASCIIRaster) Columns() int {
 	return r.header.columns
 }
 
 // Sets the number of columns of this ArcGIS binary raster file.
-func (r *arcGisAsciiRaster) SetColumns(value int) {
+func (r *arcGisASCIIRaster) SetColumns(value int) {
 	r.header.columns = value
 }
 
 // Retrieve the raster's northern edge's coordinate
-func (r *arcGisAsciiRaster) North() float64 {
+func (r *arcGisASCIIRaster) North() float64 {
 	return r.header.north
 }
 
 // Retrieve the raster's southern edge's coordinate
-func (r *arcGisAsciiRaster) South() float64 {
+func (r *arcGisASCIIRaster) South() float64 {
 	return r.header.south
 }
 
 // Retrieve the raster's eastern edge's coordinate
-func (r *arcGisAsciiRaster) East() float64 {
+func (r *arcGisASCIIRaster) East() float64 {
 	return r.header.east
 }
 
 // Retrieve the raster's western edge's coordinate
-func (r *arcGisAsciiRaster) West() float64 {
+func (r *arcGisASCIIRaster) West() float64 {
 	return r.header.west
 }
 
 // Retrieve the raster's minimum value
-func (r *arcGisAsciiRaster) MinimumValue() float64 {
+func (r *arcGisASCIIRaster) MinimumValue() float64 {
 	if r.minimumValue == math.MaxFloat64 {
 		r.minimumValue, r.maximumValue = r.findMinAndMaxVals()
 	}
@@ -149,14 +149,14 @@ func (r *arcGisAsciiRaster) MinimumValue() float64 {
 }
 
 // Retrieve the raster's minimum value
-func (r *arcGisAsciiRaster) MaximumValue() float64 {
+func (r *arcGisASCIIRaster) MaximumValue() float64 {
 	if r.maximumValue == -math.MaxFloat64 {
 		r.minimumValue, r.maximumValue = r.findMinAndMaxVals()
 	}
 	return r.maximumValue
 }
 
-func (r *arcGisAsciiRaster) findMinAndMaxVals() (minVal float64, maxVal float64) {
+func (r *arcGisASCIIRaster) findMinAndMaxVals() (minVal float64, maxVal float64) {
 	if r.data != nil && len(r.data) > 0 {
 		minVal = math.MaxFloat64
 		maxVal = -math.MaxFloat64
@@ -177,51 +177,51 @@ func (r *arcGisAsciiRaster) findMinAndMaxVals() (minVal float64, maxVal float64)
 }
 
 // Sets the raster config
-func (r *arcGisAsciiRaster) SetRasterConfig(value *RasterConfig) {
+func (r *arcGisASCIIRaster) SetRasterConfig(value *RasterConfig) {
 	r.config = value
 }
 
 // Retrieves the raster config
-func (r *arcGisAsciiRaster) GetRasterConfig() *RasterConfig {
+func (r *arcGisASCIIRaster) GetRasterConfig() *RasterConfig {
 	return r.config
 }
 
 // Retrieve the NoData value used by this ArcGIS binary raster file.
-func (r *arcGisAsciiRaster) NoData() float64 {
+func (r *arcGisASCIIRaster) NoData() float64 {
 	return r.header.nodata
 }
 
 // Sets the NoData value used by this ArcGIS binary raster file.
-func (r *arcGisAsciiRaster) SetNoData(value float64) {
+func (r *arcGisASCIIRaster) SetNoData(value float64) {
 	r.header.nodata = value
 }
 
 // Retrieve the byte order used by this ArcGIS binary raster file.
-func (r *arcGisAsciiRaster) ByteOrder() binary.ByteOrder {
+func (r *arcGisASCIIRaster) ByteOrder() binary.ByteOrder {
 	return nil
 }
 
 // Sets the byte order used by this ArcGIS binary raster file.
-func (r *arcGisAsciiRaster) SetByteOrder(value binary.ByteOrder) {
+func (r *arcGisASCIIRaster) SetByteOrder(value binary.ByteOrder) {
 	// Do nothing, there is no byte order for ASCII file formats
 	// This method is simply present to satisfy the RasterData interface
 }
 
 // Retrieves the metadata for this raster
-func (r *arcGisAsciiRaster) MetadataEntries() []string {
+func (r *arcGisASCIIRaster) MetadataEntries() []string {
 	// This file format does not support metadata. This method
 	// is simply present to satisfy the rasterData interface.
 	return nil
 }
 
 // Adds a metadata entry to this raster
-func (r *arcGisAsciiRaster) AddMetadataEntry(value string) {
+func (r *arcGisASCIIRaster) AddMetadataEntry(value string) {
 	// This file format does not support metadata. This method
 	// is simply present to satisfy the rasterData interface.
 }
 
 // Returns the data as a slice of float64 values
-func (r *arcGisAsciiRaster) Data() ([]float64, error) {
+func (r *arcGisASCIIRaster) Data() ([]float64, error) {
 	if len(r.data) == 0 {
 		r.ReadFile()
 	}
@@ -229,7 +229,7 @@ func (r *arcGisAsciiRaster) Data() ([]float64, error) {
 }
 
 // Sets the data from a slice of float64 values
-func (r *arcGisAsciiRaster) SetData(values []float64) {
+func (r *arcGisASCIIRaster) SetData(values []float64) {
 	if r.header.numCells == 0 {
 		r.header.numCells = r.header.rows * r.header.columns
 	}
@@ -241,12 +241,12 @@ func (r *arcGisAsciiRaster) SetData(values []float64) {
 }
 
 // Returns the value within data
-func (r *arcGisAsciiRaster) Value(index int) float64 {
+func (r *arcGisASCIIRaster) Value(index int) float64 {
 	return float64(r.data[index])
 }
 
 // Sets the value of index within data
-func (r *arcGisAsciiRaster) SetValue(index int, value float64) {
+func (r *arcGisASCIIRaster) SetValue(index int, value float64) {
 	r.data[index] = value
 }
 
@@ -262,7 +262,7 @@ func (r *arcGisAsciiRaster) SetValue(index int, value float64) {
 //}
 
 // Save the file
-func (r *arcGisAsciiRaster) Save() (err error) {
+func (r *arcGisASCIIRaster) Save() (err error) {
 	// does the file already exist? If yes, delete it.
 	if _, err = os.Stat(r.fileName); err == nil {
 		if err = os.Remove(r.fileName); err != nil {
@@ -315,7 +315,7 @@ func (r *arcGisAsciiRaster) Save() (err error) {
 }
 
 // Reads the file
-func (r *arcGisAsciiRaster) ReadFile() error {
+func (r *arcGisASCIIRaster) ReadFile() error {
 	// read the header file
 	if r.fileName == "" {
 		return FileReadingError
@@ -408,7 +408,7 @@ func (r *arcGisAsciiRaster) ReadFile() error {
 	return nil
 }
 
-type arcGisAsciiRasterHeader struct {
+type arcGisASCIIRasterHeader struct {
 	rows           int
 	columns        int
 	numCells       int
@@ -421,7 +421,7 @@ type arcGisAsciiRasterHeader struct {
 	cellCornerMode bool
 }
 
-func (r *arcGisAsciiRaster) check(e error) {
+func (r *arcGisASCIIRaster) check(e error) {
 	if e != nil {
 		panic(e)
 	}

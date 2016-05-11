@@ -107,13 +107,13 @@ func (this *PrintLASInfo) Run() {
 	buffer.WriteString(fmt.Sprintf("File Name: %v\n", input.GetFileName()))
 	day, month := convertYearday(int(input.Header.FileCreationDay), int(input.Header.FileCreationYear))
 	buffer.WriteString(fmt.Sprintf("Creation Date: %v %v, %v\n", day, month, input.Header.FileCreationYear))
-	buffer.WriteString(fmt.Sprintf("Generating software: %v\n", input.Header.GeneratingSoftware))
-	buffer.WriteString(fmt.Sprintf("LAS version: %v.%v\n", input.Header.VersionMajor, input.Header.VersionMajor))
-	buffer.WriteString(fmt.Sprintf("Number of Points: %v\n", input.Header.NumberPoints))
-	buffer.WriteString(fmt.Sprintf("Point record length: %v\n", input.Header.PointRecordLength))
-	buffer.WriteString(fmt.Sprintf("Point record format: %v\n", input.Header.PointFormatID))
+	//buffer.WriteString(fmt.Sprintf("Generating software: %v\n", input.Header.GeneratingSoftware))
+	buffer.WriteString(fmt.Sprintf("LAS version: %v.%v\n", input.Header.VersionMajor, input.Header.VersionMinor))
+	//buffer.WriteString(fmt.Sprintf("Number of Points: %v\n", input.Header.NumberPoints))
+	//buffer.WriteString(fmt.Sprintf("Point record length: %v\n", input.Header.PointRecordLength))
+	//buffer.WriteString(fmt.Sprintf("Point record format: %v\n", input.Header.PointFormatID))
 
-	buffer.WriteString(fmt.Sprintf("Point record format: %v\n", input.Header.String()))
+	buffer.WriteString(fmt.Sprintf("%v\n", input.Header.String()))
 
 	println(buffer.String())
 }
