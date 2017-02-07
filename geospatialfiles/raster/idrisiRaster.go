@@ -454,7 +454,7 @@ func (r *idrisiRaster) readHeaderFile() error {
 		} else if strings.Contains(str, "ref.") && strings.Contains(str, "system") && !strings.Contains(str, "lineage") {
 			r.config.CoordinateRefSystemWKT = strings.TrimSpace(s[len(s)-1])
 		} else if strings.Contains(str, "byteorder") && !strings.Contains(str, "lineage") {
-			if strings.Contains(strings.ToLower(s[len(s)-1]), "LITTLE_ENDIAN") {
+			if strings.Contains(strings.ToLower(s[len(s)-1]), "little_endian") {
 				r.config.ByteOrder = binary.LittleEndian
 			} else {
 				r.config.ByteOrder = binary.BigEndian

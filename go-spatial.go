@@ -59,7 +59,7 @@ func main() {
 	//args := os.Args[1:]
 	if runTool == "" { //len(args) == 0 {
 		// run it in command line mode
-		println(getHeaderText("Welcome to GoSpatial!"))
+		println(getHeaderText("Welcome to GoSpatial"))
 		consolereader := bufio.NewReader(os.Stdin)
 		carryon = true
 

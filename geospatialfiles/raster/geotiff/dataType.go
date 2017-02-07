@@ -36,7 +36,7 @@ var dataTypeList = []string{
 	"Double",
 }
 
-// String returns the English name of the RasterType ("ArcGisBinaryRaster", "ArcGisAsciiRaster", ...).
+// String returns the English name of the DataType ("Byte", "ASCII", ...).
 func (g GeotiffDataType) String() string { return dataTypeList[g-1] }
 
 func (g GeotiffDataType) GetBitLength() uint32 {

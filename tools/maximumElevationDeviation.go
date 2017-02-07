@@ -338,10 +338,12 @@ func (this *MaximumElevationDeviation) Run() {
 		}
 		progress = int(100.0 * row / rowsLessOne)
 		if progress%5 == 0 && progress != oldProgress {
-			printf("Calculating integral image: %v%%\n", progress)
+			printf("\rCalculating integral image: %v%%", progress)
 			oldProgress = progress
 		}
 	}
+
+	println("\r                                    ")
 
 	oldProgress = -1
 	loopNum := 1
@@ -408,9 +410,9 @@ func (this *MaximumElevationDeviation) Run() {
 				}
 			}
 			progress = int(100.0 * row / rowsLessOne)
-			if progress%5 == 0 && progress != oldProgress {
+			if progress != oldProgress {
 				str = fmt.Sprintf("Loop %v of %v", loopNum, numLoops)
-				printf("%s: %v%%\n", str, progress)
+				printf("\r%s: %v%%", str, progress)
 				oldProgress = progress
 			}
 		}
