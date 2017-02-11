@@ -15,7 +15,7 @@ import (
 	"github.com/jblindsay/go-spatial/tools"
 )
 
-var version = "0.1.0."
+var version = "0.1.1."
 var githash = "0000"
 var buildstamp = "no build stamp provided"
 
@@ -45,6 +45,14 @@ func main() {
 	flag.StringVar(&toolArgs, "args", "", "Specify tool arguments, delimited by commas or semicolons")
 	var cwd string
 	flag.StringVar(&cwd, "cwd", "", "Change the working directory")
+	var listTools = false
+	flag.BoolVar(&listTools, "listtools", false, "Lists all available tools")
+	var toolHelp string
+	flag.StringVar(&toolHelp, "toolhelp", "", "Prints help documentation for a tool")
+	var toolArgsStr string
+	flag.StringVar(&toolArgsStr, "toolargs", "", "Prints details about the arguments for a tool")
+	var helpArg = false
+	flag.BoolVar(&helpArg, "help", false, "Help")
 	flag.Parse()
 
 	//	if flagCpuprofile != "" {
@@ -57,7 +65,59 @@ func main() {
 	//	}
 
 	//args := os.Args[1:]
-	if runTool == "" { //len(args) == 0 {
+	if listTools {
+		if cmd, ok := commandMap["listtools"]; ok {
+			cmd()
+		} else {
+			printerr(fmt.Errorf("Unrecognized command '%s', type 'help' for details...", commandArgs[0]))
+		}
+	} else if helpArg {
+		if cmd, ok := commandMap["help"]; ok {
+			cmd()
+		} else {
+			printerr(fmt.Errorf("Unrecognized command '%s', type 'help' for details...", commandArgs[0]))
+		}
+	} else if toolHelp != "" {
+		commandArgs = []string{"toolhelp", toolHelp}
+		if cmd, ok := commandMap["toolhelp"]; ok {
+			cmd()
+		} else {
+			printerr(fmt.Errorf("Unrecognized command '%s', type 'help' for details...", commandArgs[0]))
+		}
+	} else if toolArgsStr != "" {
+		commandArgs = []string{"toolargs", toolArgsStr}
+		if cmd, ok := commandMap["toolargs"]; ok {
+			cmd()
+		} else {
+			printerr(fmt.Errorf("Unrecognized command '%s', type 'help' for details...", commandArgs[0]))
+		}
+	} else if runTool != "" {
+		//		var runTool string
+		//		flag.StringVar(&runTool, "run", "", "Run a particular tool")
+		//		var toolArgs string
+		//		flag.StringVar(&toolArgs, "args", "", "Specify tool arguments, delimited by commas or semicolons")
+		//		var cwd string
+		//		flag.StringVar(&cwd, "cwd", "", "Change the working directory")
+		//		flag.Parse()
+		if len(strings.TrimSpace(cwd)) > 0 {
+			changeWorkingDirectory(cwd)
+		}
+		toolArgs = strings.Replace(toolArgs, "%s", " ", -1)
+		argsArray := []string{}
+		if len(toolArgs) > 0 {
+			// parse the args
+			f := func(c rune) bool {
+				return !unicode.IsLetter(c) && !unicode.IsNumber(c) && c != '.' && c != os.PathSeparator && c != ' ' && c != '-' && c != '_'
+			}
+			argsArray = strings.FieldsFunc(toolArgs, f)
+		}
+		if len(strings.TrimSpace(runTool)) > 0 {
+			if err = toolManager.RunWithArguments(strings.TrimSpace(runTool), argsArray); err != nil {
+				printerr(err)
+				//printerr(fmt.Errorf("Unrecognized tool name '%s;. Type 'listtools' for a list of available tools.", commandArgs[1]))
+			}
+		}
+	} else {
 		// run it in command line mode
 		println(getHeaderText("Welcome to GoSpatial"))
 		consolereader := bufio.NewReader(os.Stdin)
@@ -82,32 +142,6 @@ func main() {
 				}
 			} else {
 				printErrString("Empty command, type 'help' for details...")
-			}
-		}
-	} else {
-		//		var runTool string
-		//		flag.StringVar(&runTool, "run", "", "Run a particular tool")
-		//		var toolArgs string
-		//		flag.StringVar(&toolArgs, "args", "", "Specify tool arguments, delimited by commas or semicolons")
-		//		var cwd string
-		//		flag.StringVar(&cwd, "cwd", "", "Change the working directory")
-		//		flag.Parse()
-		if len(strings.TrimSpace(cwd)) > 0 {
-			changeWorkingDirectory(cwd)
-		}
-		toolArgs = strings.Replace(toolArgs, "%s", " ", -1)
-		argsArray := []string{}
-		if len(toolArgs) > 0 {
-			// parse the args
-			f := func(c rune) bool {
-				return !unicode.IsLetter(c) && !unicode.IsNumber(c) && c != '.' && c != os.PathSeparator && c != ' ' && c != '-' && c != '_'
-			}
-			argsArray = strings.FieldsFunc(toolArgs, f)
-		}
-		if len(strings.TrimSpace(runTool)) > 0 {
-			if err = toolManager.RunWithArguments(strings.TrimSpace(runTool), argsArray); err != nil {
-				printerr(err)
-				//printerr(fmt.Errorf("Unrecognized tool name '%s;. Type 'listtools' for a list of available tools.", commandArgs[1]))
 			}
 		}
 	}
@@ -166,7 +200,6 @@ func init() {
 			} else {
 				println(s)
 			}
-
 		} else {
 			println("Tool name not specified, e.g. toolhelp BreachDepressions")
 		}
@@ -287,7 +320,7 @@ func init() {
 			plugs = append(plugs, trailingSpaces(value.GetName(), 20)+value.GetDescription())
 		}
 		sort.Strings(plugs)
-		printf("The following tools %v are available:\n", len(pt))
+		printf("The following %v tools are available:\n", len(pt))
 		for _, value := range plugs {
 			println(value)
 		}

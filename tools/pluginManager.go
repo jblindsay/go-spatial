@@ -219,7 +219,21 @@ func (ptm *PluginToolManager) GetToolHelp(toolName string) (string, error) {
 	toolName = strings.ToLower(getFormattedToolName(toolName))
 	if tool, ok := ptm.mapOfPluginTools[toolName]; ok {
 		//showToolHelp(tool)
-		return tool.GetHelpDocumentation(), nil
+		ret := tool.GetHelpDocumentation()
+		if ret != "" {
+			args := tool.GetArgDescriptions()
+			for a := 0; a < len(args); a++ {
+				ret += "\nArg Name: " + args[a][0] + ", type: " + args[a][1] + ", Description: " + args[a][2]
+			}
+			return ret, nil
+		} else {
+			ret = tool.GetDescription()
+			args := tool.GetArgDescriptions()
+			for a := 0; a < len(args); a++ {
+				ret += "\nArg Name: " + args[a][0] + ", type: " + args[a][1] + ", Description: " + args[a][2]
+			}
+			return ret, nil
+		}
 	}
 	return "", errors.New("Unrecognized tool name. Type 'listtools' for a list of available tools.\n")
 }
