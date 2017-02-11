@@ -62,7 +62,8 @@ Please enter a command: cwd /Users/johnlinsay/Documents/data
 To print a list of available tools, use the ```listtools``` command:
 ```
 Please enter a command: listtools
-The following tools 11 are available:
+The following 15 tools are available:
+Aspect               Calculates aspect from a DEM
 BreachDepressions    Removes depressions in DEMs using selective breaching
 D8FlowAccumulation   Performs D8 flow accumulation on a DEM
 DeviationFromMean    Calculates the deviation from mean
@@ -70,9 +71,12 @@ ElevationPercentile  Calculates the local elevation percentile for a DEM
 FD8FlowAccum         Performs FD8 flow accumulation on a DEM
 FillDepressions      Removes depressions in DEMs using filling
 FillSmallNodataHoles Fills small nodata holes in a raster
+Hillshade            Calculates a hillshade raster from a DEM
 MaxElevationDeviatio Calculates the maximum elevation deviation across a ran
 PrintGeoTiffTags     Prints a GeoTiff's tags
+PrintLASInfo         Prints details of a LAS file
 Quantiles            Tranforms raster values into quantiles
+Slope                Calculates slope from a DEM
 Whitebox2GeoTiff     Converts Whitebox GAT raster to GeoTiff
 ```
 
@@ -86,7 +90,7 @@ Please enter a command: run BreachDepressions
 Enter the DEM file name (incl. file extension):
 ```
 
-When you run a tool from the command-line interface, you will be guided in terms of the input of the arguments required to run the tool. When you are prompted for an input file name (as in the above example), if the file resides in the current working directory, you can safely omit the directory from the file name. If you would like to print a list of arguments needed to run a particular plugin tool, with descriptions, use the ```toolargs``` command:
+When you run a tool from the command-line interface, you will be guided in terms of the input of the arguments required to run the tool. When you are prompted for an input file name (as in the above example), if the file resides in the current working directory, you can omit the directory from the file name. If you would like to print a list of arguments needed to run a particular plugin tool, with descriptions, use the ```toolargs``` command:
 
 ```
 Please enter a command: toolargs breachdepressions
@@ -115,9 +119,80 @@ Elapsed time (total): 6.087567077s
 $
 ```
 
-Sometimes you need to call a GoSpatial tool in an automated fashion, rather than using the GoSpatial command-line interface. Here is an example for how to call a GoSpatial tool from a Python script:
+Sometimes you need to call a GoSpatial tool in an automated fashion, rather than using the GoSpatial command-line interface. Here is an example (*gospatial_example.py* in source folder) of interacting with the GoSpatial library from a Python script:
 
 ```python
+#! /usr/bin/env python3
+import sys
+from gospatial import run_tool, list_tools, tool_help, tool_args, set_working_dir, help
+
+def main():
+    try:
+        # List all available tools in gospatial
+        print(list_tools())
+
+        # Prints the gospatial help...a listing of available commands
+        print(help())
+
+        # Print the help documentation for the Aspect tool
+        print(tool_help("Aspect"))
+
+        # Prints the arguments used for running the FillDepressions tool
+        print(tool_args("FillDepressions"))
+
+        # Sets the working directory. If the working dir is set, you don't
+        # need to specify complete file names (with paths) to tools that you run.
+        set_working_dir("/Users/johnlindsay/Documents/data/JayStateForest/")
+
+        # Run the Whitebox2Geotiff tool, specifying the arguments.
+        name = "Whitebox2Geotiff"
+        args = [
+            "DEM no OTOs hillshade.dep",
+            "DEM no OTOs hillshade.tif"
+        ]
+
+        # Run the tool and check the return value
+        ret = run_tool(name, args, cb)
+        if ret != 0:
+            print("ERROR: return value={}".format(ret))
+
+        # Run the Aspect tool, specifying the arguments.
+        name = "Aspect"
+        args = [
+            "DEM no OTOs.dep",
+            "temp2.dep"
+        ]
+
+        # Run the tool and check the return value
+        ret = run_tool(name, args, cb)
+        if ret != 0:
+            print("ERROR: return value={}".format(ret))
+
+    except:
+        print("Unexpected error:", sys.exc_info()[0])
+        raise
+
+# Create a custom callback to process the text coming out of the tool.
+# If a callback is not provided, it will simply print the output stream.
+def cb(s):
+    if "%" in s:
+        str_array = s.split(" ")
+        label = s.replace(str_array[len(str_array)-1], "")
+        progress = int(str_array[len(str_array)-1].replace("%", "").strip())
+        print("\rProgress: {}%".format(progress)),
+    else:
+        if "error" in s.lower():
+            print("\rERROR: {}".format(s)),
+        else:
+            if not s.startswith("*"):
+                print("\r{}          ".format(s)),
+
+main()
+```
+
+The code above uses the *gospatial.py* helper script, also found in the source folder.
+
+<!-- ```python
 #! /usr/bin/env python3
 import subprocess
 
@@ -133,7 +208,7 @@ p = subprocess.Popen(a)
 print("Running process...")
 p.wait()
 print("Done!")
-```
+``` -->
 
 ##License
 GoSpatial is distributed under the [MIT open-source license](./LICENSE).
