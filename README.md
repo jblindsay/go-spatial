@@ -9,7 +9,9 @@ To install the GoSpatial source code using the ```go get``` tool within the term
 go get github.com/jblindsay/go-spatial
 ```
 
-You may then build an executable file using the ```go build``` tool. Pre-compiled versions of the GoSpatial executable will be provided for various supported platforms in the near future and distributed from the [Centre for Hydrogeomatics](http://www.uoguelph.ca/~hydrogeo/software.shtml "Centre for Hydrogeomatics homepage") homepage.
+You may then build an executable file using the ```go build``` tool. Alternatively, you may call the *build.py* script, although [Go](https://golang.org) must be installed on the host computer.
+
+**Pre-compiled versions** of the GoSpatial executable are available for various supported platforms and are distributed from the [Centre for Hydrogeomatics](http://www.uoguelph.ca/~hydrogeo/software.shtml "Centre for Hydrogeomatics homepage") homepage.
 
 ##Usage
 
