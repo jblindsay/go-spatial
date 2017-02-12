@@ -119,30 +119,31 @@ Elapsed time (total): 6.087567077s
 $
 ```
 
+###Calling GoSpatial Tools From A Script
 Sometimes you need to call a GoSpatial tool in an automated fashion, rather than using the GoSpatial command-line interface. Here is an example (*gospatial_example.py* in source folder) of interacting with the GoSpatial library from a Python script:
 
 ```python
-#! /usr/bin/env python3
+#!/usr/bin/env python
 import sys
-from gospatial import run_tool, list_tools, tool_help, tool_args, set_working_dir, help
+import gospatial as gs
 
 def main():
     try:
         # List all available tools in gospatial
-        print(list_tools())
+        print(gs.list_tools())
 
         # Prints the gospatial help...a listing of available commands
-        print(help())
+        print(gs.help())
 
         # Print the help documentation for the Aspect tool
-        print(tool_help("Aspect"))
+        print(gs.tool_help("Aspect"))
 
         # Prints the arguments used for running the FillDepressions tool
-        print(tool_args("FillDepressions"))
+        print(gs.tool_args("FillDepressions"))
 
         # Sets the working directory. If the working dir is set, you don't
         # need to specify complete file names (with paths) to tools that you run.
-        set_working_dir("/Users/johnlindsay/Documents/data/JayStateForest/")
+        gs.set_working_dir("/Users/johnlindsay/Documents/data/JayStateForest/")
 
         # Run the Whitebox2Geotiff tool, specifying the arguments.
         name = "Whitebox2Geotiff"
@@ -152,7 +153,7 @@ def main():
         ]
 
         # Run the tool and check the return value
-        ret = run_tool(name, args, cb)
+        ret = gs.run_tool(name, args, cb)
         if ret != 0:
             print("ERROR: return value={}".format(ret))
 
@@ -164,7 +165,7 @@ def main():
         ]
 
         # Run the tool and check the return value
-        ret = run_tool(name, args, cb)
+        ret = gs.run_tool(name, args, cb)
         if ret != 0:
             print("ERROR: return value={}".format(ret))
 
