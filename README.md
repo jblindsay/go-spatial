@@ -1,6 +1,6 @@
 # GoSpatial
 ##Description
-GoSpatial is a command-line interface program for analyzing and manipulating geospatial data. It has been developed by [John Lindsay](http://www.uoguelph.ca/geography/faculty/lindsay-john "John Lindsay's homepage") using the [Go](https://golang.org "Go programming language homepage") programming language and is compiled to native code. The project is experimental and is intended to provide additional analytical support for the [Whitebox Geospatial Analysis Tools](http://www.uoguelph.ca/~hydrogeo/Whitebox/ "Whitebox GAT homepage") open-source GIS software. GoSpatial can however be run completely independent of any other software.
+GoSpatial is a command-line interface program for analyzing and manipulating geospatial data. It has been developed by [John Lindsay](http://www.uoguelph.ca/geography/faculty/lindsay-john "John Lindsay's homepage") using the [Go](https://golang.org "Go programming language homepage") programming language and is compiled to native code. The project is experimental and is intended to provide additional analytical support for the [Whitebox Geospatial Analysis Tools](http://www.uoguelph.ca/~hydrogeo/Whitebox/ "Whitebox GAT homepage") open-source GIS software. GoSpatial can however run completely independently of any other software. Visit the GoSpatial homepage [here](http://www.uoguelph.ca/~hydrogeo/software.shtml).
 
 ##Install
 To install the GoSpatial source code using the ```go get``` tool within the terminal, simply type:
@@ -141,27 +141,11 @@ def main():
         # Prints the arguments used for running the FillDepressions tool
         print(gs.tool_args("FillDepressions"))
 
-        # Sets the working directory. If the working dir is set, you don't
-        # need to specify complete file names (with paths) to tools that you run.
-        gs.set_working_dir("/Users/johnlindsay/Documents/data/JayStateForest/")
-
-        # Run the Whitebox2Geotiff tool, specifying the arguments.
-        name = "Whitebox2Geotiff"
-        args = [
-            "DEM no OTOs hillshade.dep",
-            "DEM no OTOs hillshade.tif"
-        ]
-
-        # Run the tool and check the return value
-        ret = gs.run_tool(name, args, cb)
-        if ret != 0:
-            print("ERROR: return value={}".format(ret))
-
         # Run the Aspect tool, specifying the arguments.
         name = "Aspect"
         args = [
             "DEM no OTOs.dep",
-            "temp2.dep"
+            "aspect.dep"
         ]
 
         # Run the tool and check the return value
