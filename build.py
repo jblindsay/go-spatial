@@ -2,6 +2,7 @@
 import os
 import sys
 import subprocess
+import time
 from subprocess import call
 
 try:
@@ -47,14 +48,17 @@ try:
         else:
             print >>sys.stderr, "Clean code executed successfully"
 
+    t = time.strftime("%Y.%m.%d.%H.%M")
+    val = "-ldflags='-X=main.buildstamp={}'".format(t)
+
     if mode == "build":
-        retcode = call(['go', 'build', '-v',], shell=False)
+        retcode = call(['go', 'build', val, '-v'], shell=False)
         if retcode < 0:
             print >>sys.stderr, "Child was terminated by signal", -retcode
         else:
             print >>sys.stderr, "Build code executed successfully"
     elif mode == "install":
-        retcode = call(['go', 'install'], shell=False)
+        retcode = call(['go', 'install', val], shell=False)
         if retcode < 0:
             print >>sys.stderr, "Child was terminated by signal", -retcode
         else:

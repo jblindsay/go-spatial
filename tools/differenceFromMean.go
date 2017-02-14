@@ -19,33 +19,33 @@ import (
 	"github.com/jblindsay/go-spatial/geospatialfiles/raster"
 )
 
-type DeviationFromMean struct {
+type DifferenceFromMean struct {
 	inputFile         string
 	outputFile        string
 	neighbourhoodSize int
 	toolManager       *PluginToolManager
 }
 
-func (this *DeviationFromMean) GetName() string {
-	s := "DeviationFromMean"
+func (this *DifferenceFromMean) GetName() string {
+	s := "DifferenceFromMean"
 	return getFormattedToolName(s)
 }
 
-func (this *DeviationFromMean) GetDescription() string {
-	s := "Calculates the deviation from mean"
+func (this *DifferenceFromMean) GetDescription() string {
+	s := "Calculates the difference from mean"
 	return getFormattedToolDescription(s)
 }
 
-func (this *DeviationFromMean) GetHelpDocumentation() string {
-	ret := "This tool is used to perform a fast deviation from local mean filter operation."
+func (this *DifferenceFromMean) GetHelpDocumentation() string {
+	ret := "This tool is used to perform a fast difference from local mean filter operation."
 	return ret
 }
 
-func (this *DeviationFromMean) SetToolManager(tm *PluginToolManager) {
+func (this *DifferenceFromMean) SetToolManager(tm *PluginToolManager) {
 	this.toolManager = tm
 }
 
-func (this *DeviationFromMean) GetArgDescriptions() [][]string {
+func (this *DifferenceFromMean) GetArgDescriptions() [][]string {
 	numArgs := 3
 
 	ret := make([][]string, numArgs)
@@ -67,7 +67,7 @@ func (this *DeviationFromMean) GetArgDescriptions() [][]string {
 	return ret
 }
 
-func (this *DeviationFromMean) ParseArguments(args []string) {
+func (this *DifferenceFromMean) ParseArguments(args []string) {
 	inputFile := args[0]
 	inputFile = strings.TrimSpace(inputFile)
 	if !strings.Contains(inputFile, pathSep) {
@@ -106,7 +106,7 @@ func (this *DeviationFromMean) ParseArguments(args []string) {
 	this.Run()
 }
 
-func (this *DeviationFromMean) CollectArguments() {
+func (this *DifferenceFromMean) CollectArguments() {
 	consolereader := bufio.NewReader(os.Stdin)
 
 	// get the input file name
@@ -165,14 +165,14 @@ func (this *DeviationFromMean) CollectArguments() {
 	this.Run()
 }
 
-func (this *DeviationFromMean) Run() {
+func (this *DifferenceFromMean) Run() {
 	start1 := time.Now()
 
 	var progress, oldProgress, col, row int
-	var z, sum, sumSqr float64
+	var z, sum float64
 	var sumN, N int
 	var x1, x2, y1, y2 int
-	var outValue, v, s, m float64
+	var outValue, mean float64
 
 	println("Reading raster data...")
 	rin, err := raster.CreateRasterFromFile(this.inputFile)
@@ -185,20 +185,19 @@ func (this *DeviationFromMean) Run() {
 	nodata := rin.NoDataValue
 	inConfig := rin.GetRasterConfig()
 	minValue := rin.GetMinimumValue()
-	maxValue := rin.GetMaximumValue()
-	valueRange := maxValue - minValue
-	k := minValue + valueRange/2.0
+	// maxValue := rin.GetMaximumValue()
+	// valueRange := maxValue - minValue
+	k := minValue //+ valueRange/2.0
+	multiplier := 100.0
 
 	start2 := time.Now()
 
 	// Initialize the arrays to hold the integral image, integral image squared, and number of valid cells
-	I := make([][]float64, rows)
-	I2 := make([][]float64, rows)
+	I := make([][]uint64, rows)
 	IN := make([][]int, rows)
 
 	for row = 0; row < rows; row++ {
-		I[row] = make([]float64, columns)
-		I2[row] = make([]float64, columns)
+		I[row] = make([]uint64, columns)
 		IN[row] = make([]int, columns)
 	}
 
@@ -207,25 +206,21 @@ func (this *DeviationFromMean) Run() {
 	oldProgress = 0
 	for row = 0; row < rows; row++ {
 		sum = 0
-		sumSqr = 0
 		sumN = 0
 		for col = 0; col < columns; col++ {
 			z = rin.Value(row, col)
 			if z == nodata {
 				z = 0
 			} else {
-				z = z - k
+				z = (z - k) * multiplier
 				sumN++
 			}
 			sum += z
-			sumSqr += z * z
 			if row > 0 {
-				I[row][col] = sum + I[row-1][col]
-				I2[row][col] = sumSqr + I2[row-1][col]
+				I[row][col] = uint64(sum) + I[row-1][col]
 				IN[row][col] = sumN + IN[row-1][col]
 			} else {
-				I[row][col] = sum
-				I2[row][col] = sumSqr
+				I[row][col] = uint64(sum)
 				IN[row][col] = sumN
 			}
 		}
@@ -252,6 +247,8 @@ func (this *DeviationFromMean) Run() {
 	}
 
 	printf("\rPerforming analysis (2 of 2): %v%%\n", 0)
+	minVal := math.Inf(1)
+	maxVal := math.Inf(-1)
 	oldProgress = 0
 	for row = 0; row < rows; row++ {
 		y1 = row - this.neighbourhoodSize - 1
@@ -290,16 +287,15 @@ func (this *DeviationFromMean) Run() {
 
 				N = IN[y2][x2] + IN[y1][x1] - IN[y1][x2] - IN[y2][x1]
 				if N > 0 {
-					sum = I[y2][x2] + I[y1][x1] - I[y1][x2] - I[y2][x1]
-					sumSqr = I2[y2][x2] + I2[y1][x1] - I2[y1][x2] - I2[y2][x1]
-					v = (sumSqr - (sum*sum)/float64(N)) / float64(N)
-					if v > 0 {
-						s = math.Sqrt(v)
-						m = sum / float64(N)
-						outValue = ((z - k) - m) / s
-						rout.SetValue(row, col, outValue)
-					} else {
-						rout.SetValue(row, col, 0)
+					sum = float64(I[y2][x2]+I[y1][x1]-I[y1][x2]-I[y2][x1]) / multiplier
+					mean = sum / float64(N)
+					outValue = (z - k) - mean
+					rout.SetValue(row, col, outValue)
+					if outValue > maxVal {
+						maxVal = outValue
+					}
+					if outValue < minVal {
+						minVal = outValue
 					}
 				} else {
 					rout.SetValue(row, col, 0)
@@ -318,8 +314,9 @@ func (this *DeviationFromMean) Run() {
 	rout.AddMetadataEntry(fmt.Sprintf("Elapsed Time: %v", elapsed))
 	rout.AddMetadataEntry(fmt.Sprintf("Created by DeviationFromMean tool"))
 	rout.AddMetadataEntry(fmt.Sprintf("Window size: %v", (this.neighbourhoodSize*2 + 1)))
-	config.DisplayMinimum = -2.58
-	config.DisplayMaximum = 2.58
+	palVal := math.Min(math.Abs(minVal), maxVal)
+	config.DisplayMinimum = -palVal
+	config.DisplayMaximum = palVal
 	rout.SetRasterConfig(config)
 	rout.Save()
 

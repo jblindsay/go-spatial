@@ -349,7 +349,7 @@ func (this *ElevationPercentile) Run() {
 
 	oldProgress = -1
 	for row = 0; row < rows; row++ {
-		y1 = row - this.neighbourhoodSize
+		y1 = row - this.neighbourhoodSize - 1
 		if y1 < 0 {
 			y1 = 0
 		}
@@ -374,7 +374,7 @@ func (this *ElevationPercentile) Run() {
 				}
 				bin = binNumMap[j]
 
-				x1 = col - this.neighbourhoodSize
+				x1 = col - this.neighbourhoodSize - 1
 				if x1 < 0 {
 					x1 = 0
 				}

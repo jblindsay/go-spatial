@@ -15,8 +15,9 @@ import (
 	"github.com/jblindsay/go-spatial/tools"
 )
 
-var version = "0.1.1."
-var githash = "0000"
+var version = "0.1.1"
+
+// var githash = "0000"
 var buildstamp = "no build stamp provided"
 
 var println = fmt.Println
@@ -53,6 +54,8 @@ func main() {
 	flag.StringVar(&toolArgsStr, "toolargs", "", "Prints details about the arguments for a tool")
 	var helpArg = false
 	flag.BoolVar(&helpArg, "help", false, "Help")
+	var ldflags string
+	flag.StringVar(&ldflags, "ldflags", "", "ldflags")
 	flag.Parse()
 
 	//	if flagCpuprofile != "" {
@@ -281,7 +284,7 @@ func init() {
 		}
 	}
 	commandMap["version"] = func() {
-		printf("GoSpatial version %s%s\nRelease date %s\n", version, githash, buildstamp) //releaseDate.Format(layout))
+		printf("GoSpatial version %s.%s\n", version, buildstamp) //releaseDate.Format(layout))
 	}
 	commandMap["v"] = commandMap["version"]
 	commandMap["pwd"] = func() {

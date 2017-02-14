@@ -18,29 +18,17 @@ def main():
 
         # Sets the working directory. If the working dir is set, you don't
         # need to specify complete file names (with paths) to tools that you run.
-        gs.set_working_dir("/Users/johnlindsay/Documents/data/JayStateForest/")
+        gs.set_working_dir("/Users/johnlindsay/Documents/data/")
 
-        # Run the Whitebox2Geotiff tool, specifying the arguments.
-        name = "Whitebox2Geotiff"
-        args = [
-            "DEM no OTOs hillshade.dep",
-            "DEM no OTOs hillshade.tif"
-        ]
-
-        # Run the tool and check the return value
-        ret = gs.run_tool(name, args, cb)
-        if ret != 0:
-            print("ERROR: return value={}".format(ret))
-
-        # Run the Aspect tool, specifying the arguments.
+        Run the Aspect tool, specifying the arguments.
         name = "Aspect"
         args = [
-            "DEM no OTOs.dep",
-            "temp2.dep"
+            "DEM.dep",
+            "aspect.dep"
         ]
 
         # Run the tool and check the return value
-        ret = gs.run_tool(name, args, cb)
+        ret = gs.run_tool(name, args, callback)
         if ret != 0:
             print("ERROR: return value={}".format(ret))
 
@@ -50,17 +38,17 @@ def main():
 
 # Create a custom callback to process the text coming out of the tool.
 # If a callback is not provided, it will simply print the output stream.
-def cb(s):
+# A provided callback allows for custom processing of the output stream.
+def callback(s):
     if "%" in s:
         str_array = s.split(" ")
         label = s.replace(str_array[len(str_array)-1], "")
         progress = int(str_array[len(str_array)-1].replace("%", "").strip())
-        print("\rProgress: {}%".format(progress)),
+        print("Progress: {}%".format(progress)),
     else:
         if "error" in s.lower():
-            print("\rERROR: {}".format(s)),
+            print("ERROR: {}".format(s)),
         else:
-            if not s.startswith("*"):
-                print("\r{}          ".format(s)),
+            print("{}".format(s)),
 
 main()

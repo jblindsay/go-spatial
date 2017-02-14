@@ -65,6 +65,9 @@ func (ptm *PluginToolManager) InitializeTools() {
 	dfm := new(DeviationFromMean)
 	ptm.mapOfPluginTools[strings.ToLower(dfm.GetName())] = dfm
 
+	diffFromMean := new(DifferenceFromMean)
+	ptm.mapOfPluginTools[strings.ToLower(diffFromMean.GetName())] = diffFromMean
+
 	med := new(MaximumElevationDeviation)
 	ptm.mapOfPluginTools[strings.ToLower(med.GetName())] = med
 
@@ -76,6 +79,9 @@ func (ptm *PluginToolManager) InitializeTools() {
 
 	fsnh := new(FillSmallNodataHoles)
 	ptm.mapOfPluginTools[strings.ToLower(fsnh.GetName())] = fsnh
+
+	mf := new(MeanFilter)
+	ptm.mapOfPluginTools[strings.ToLower(mf.GetName())] = mf
 
 }
 
