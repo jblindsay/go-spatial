@@ -18,7 +18,7 @@ def main():
 
         # Sets the working directory. If the working dir is set, you don't
         # need to specify complete file names (with paths) to tools that you run.
-        gs.set_working_dir("/Users/johnlindsay/Documents/data/")
+        gs.set_working_dir("/Users/johnlindsay/Documents/data/JayStateForest")
 
         Run the Aspect tool, specifying the arguments.
         name = "Aspect"
@@ -44,7 +44,7 @@ def callback(s):
         str_array = s.split(" ")
         label = s.replace(str_array[len(str_array)-1], "")
         progress = int(str_array[len(str_array)-1].replace("%", "").strip())
-        print("Progress: {}%".format(progress)),
+        print("Progress: {}%\n".format(progress)),
     else:
         if "error" in s.lower():
             print("ERROR: {}".format(s)),

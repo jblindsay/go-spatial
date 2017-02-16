@@ -235,7 +235,6 @@ func (this *MeanFilter) Run() {
 	runtime.GOMAXPROCS(numCPUs)
 	var wg sync.WaitGroup
 
-	// calculate hillshade
 	// fmt.Printf("\r                                                    ")
 	fmt.Printf("Progress: %v%%\n", 0)
 	startingRow := 0

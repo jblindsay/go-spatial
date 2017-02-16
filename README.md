@@ -121,7 +121,7 @@ Elapsed time (total): 6.087567077s
 $
 ```
 
-###Calling GoSpatial Tools From A Script
+###Calling GoSpatial tools from a script
 Sometimes you need to call a GoSpatial tool in an automated fashion, rather than using the GoSpatial command-line interface. Here is an example (*gospatial_example.py* in source folder) of interacting with the GoSpatial library from a Python script:
 
 ```python

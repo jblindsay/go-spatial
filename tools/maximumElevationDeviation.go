@@ -12,8 +12,10 @@ import (
 	"fmt"
 	"math"
 	"os"
+	"runtime"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/jblindsay/go-spatial/geospatialfiles/raster"
@@ -269,15 +271,15 @@ func (this *MaximumElevationDeviation) Run() {
 
 	var progress, oldProgress, col, row int
 	var z, sum, sumSqr float64
-	var sumN, N int
-	var x1, x2, y1, y2 int
-	var outValue, v, s, m float64
+	var sumN int //, N int
+	// var x1, x2, y1, y2 int
+	// var outValue, v, s, m float64
 	var str string
 
-	println("Reading raster data...")
+	fmt.Println("Reading raster data...")
 	rin, err := raster.CreateRasterFromFile(this.inputFile)
 	if err != nil {
-		println(err.Error())
+		fmt.Println(err.Error())
 	}
 	rows := rin.Rows
 	columns := rin.Columns
@@ -338,84 +340,203 @@ func (this *MaximumElevationDeviation) Run() {
 		}
 		progress = int(100.0 * row / rowsLessOne)
 		if progress%5 == 0 && progress != oldProgress {
-			printf("\rCalculating integral image: %v%%", progress)
+			fmt.Printf("Calculating integral image: %v%%\n", progress)
 			oldProgress = progress
 		}
 	}
 
-	println("\r                                    ")
+	// fmt.Println("\r                                    ")
+
+	numCPUs := runtime.NumCPU()
 
 	oldProgress = -1
 	loopNum := 1
 	numLoops := int((this.maxNeighbourhood-this.minNeighbourhood)/this.neighbourhoodStep) + 1
 	for neighbourhood := this.minNeighbourhood; neighbourhood <= this.maxNeighbourhood; neighbourhood += this.neighbourhoodStep {
-		for row = 0; row < rows; row++ {
-			y1 = row - neighbourhood
-			if y1 < 0 {
-				y1 = 0
-			}
-			if y1 >= rows {
-				y1 = rows - 1
-			}
+		c1 := make(chan bool)
+		runtime.GOMAXPROCS(numCPUs)
+		var wg sync.WaitGroup
+		startingRow := 0
+		var rowBlockSize int = rows / numCPUs
 
-			y2 = row + neighbourhood
-			if y2 < 0 {
-				y2 = 0
+		for startingRow < rows {
+			endingRow := startingRow + rowBlockSize
+			if endingRow >= rows {
+				endingRow = rows - 1
 			}
-			if y2 >= rows {
-				y2 = rows - 1
-			}
-
-			for col = 0; col < columns; col++ {
-				z = zVal[row][col]
-				if z != nodata {
-					x1 = col - neighbourhood
-					if x1 < 0 {
-						x1 = 0
+			wg.Add(1)
+			go func(rowSt, rowEnd int) {
+				defer wg.Done()
+				var x1, x2, y1, y2, N int
+				var outValue, z, sum, mean float64
+				var v, s float64
+				for row := rowSt; row <= rowEnd; row++ {
+					y1 = row - neighbourhood - 1
+					if y1 < 0 {
+						y1 = 0
 					}
-					if x1 >= columns {
-						x1 = columns - 1
+					if y1 >= rows {
+						y1 = rows - 1
 					}
 
-					x2 = col + neighbourhood
-					if x2 < 0 {
-						x2 = 0
+					y2 = row + neighbourhood
+					if y2 < 0 {
+						y2 = 0
 					}
-					if x2 >= columns {
-						x2 = columns - 1
+					if y2 >= rows {
+						y2 = rows - 1
 					}
-
-					N = IN[y2][x2] + IN[y1][x1] - IN[y1][x2] - IN[y2][x1]
-					if N > 0 {
-						sum = I[y2][x2] + I[y1][x1] - I[y1][x2] - I[y2][x1]
-						sumSqr = I2[y2][x2] + I2[y1][x1] - I2[y1][x2] - I2[y2][x1]
-						v = (sumSqr - (sum*sum)/float64(N)) / float64(N)
-						if v > 0 {
-							s = math.Sqrt(v)
-							m = sum / float64(N)
-							outValue = ((z - k) - m) / s
-							if math.Abs(outValue) > maxVal[row][col] {
-								maxVal[row][col] = math.Abs(outValue)
-								if outValue >= 0 {
-									//output.setValue(row, col, neighbourhood)
-									scaleVal[row][col] = neighbourhood
-								} else {
-									//output.setValue(row, col, -neighbourhood)
-									scaleVal[row][col] = -neighbourhood
-								}
-								//output2.setValue(row, col, outValue)
+					// floatData := make([]float64, columns)
+					for col := 0; col < columns; col++ {
+						z = rin.Value(row, col)
+						if z != nodata {
+							x1 = col - neighbourhood - 1
+							if x1 < 0 {
+								x1 = 0
 							}
-						}
+							if x1 >= columns {
+								x1 = columns - 1
+							}
+
+							x2 = col + neighbourhood
+							if x2 < 0 {
+								x2 = 0
+							}
+							if x2 >= columns {
+								x2 = columns - 1
+							}
+							N = IN[y2][x2] + IN[y1][x1] - IN[y1][x2] - IN[y2][x1]
+							if N > 0 {
+								sum = I[y2][x2] + I[y1][x1] - I[y1][x2] - I[y2][x1]
+								sumSqr = I2[y2][x2] + I2[y1][x1] - I2[y1][x2] - I2[y2][x1]
+								v = (sumSqr - (sum*sum)/float64(N)) / float64(N)
+								if v > 0 {
+									s = math.Sqrt(v)
+									mean = sum / float64(N)
+									outValue = ((z - k) - mean) / s
+									if math.Abs(outValue) > maxVal[row][col] {
+										maxVal[row][col] = math.Abs(outValue)
+										if outValue >= 0 {
+											scaleVal[row][col] = neighbourhood
+										} else {
+											scaleVal[row][col] = -neighbourhood
+										}
+									}
+								}
+							}
+
+							// N = IN[y2][x2] + IN[y1][x1] - IN[y1][x2] - IN[y2][x1]
+							// if N > 0 {
+							// 	sum = I[y2][x2] + I[y1][x1] - I[y1][x2] - I[y2][x1]
+							// 	sumSqr = I2[y2][x2] + I2[y1][x1] - I2[y1][x2] - I2[y2][x1]
+							// 	v = (sumSqr - (sum*sum)/float64(N)) / float64(N)
+							// 	if v > 0 {
+							// 		s = math.Sqrt(v)
+							// 		mean = sum / float64(N)
+							// 		outValue = ((z - k) - mean) / s
+							// 		floatData[col] = outValue
+							// 	} else {
+							// 		floatData[col] = 0
+							// 	}
+							// } else {
+							// 	floatData[col] = 0.0
+							// }
+
+						} // else {
+						//	floatData[col] = nodata
+						//}
 					}
+					//rout.SetRowValues(row, floatData)
+					c1 <- true // row completed
 				}
-			}
-			progress = int(100.0 * row / rowsLessOne)
+
+			}(startingRow, endingRow)
+			startingRow = endingRow + 1
+		}
+
+		oldProgress = 0
+		for rowsCompleted := 0; rowsCompleted < rows; rowsCompleted++ {
+			<-c1 // a row has successfully completed
+			progress = int(100.0 * float64(rowsCompleted) / float64(rowsLessOne))
 			if progress != oldProgress {
 				str = fmt.Sprintf("Loop %v of %v", loopNum, numLoops)
-				printf("\r%s: %v%%", str, progress)
+				fmt.Printf("%s: %v%%\n", str, progress)
+
+				// fmt.Printf("Progress: %v%%\n", progress)
 				oldProgress = progress
 			}
 		}
+
+		wg.Wait()
+
+		// for row = 0; row < rows; row++ {
+		// 	y1 = row - neighbourhood - 1
+		// 	if y1 < 0 {
+		// 		y1 = 0
+		// 	}
+		// 	if y1 >= rows {
+		// 		y1 = rows - 1
+		// 	}
+		//
+		// 	y2 = row + neighbourhood
+		// 	if y2 < 0 {
+		// 		y2 = 0
+		// 	}
+		// 	if y2 >= rows {
+		// 		y2 = rows - 1
+		// 	}
+		//
+		// 	for col = 0; col < columns; col++ {
+		// 		z = zVal[row][col]
+		// 		if z != nodata {
+		// 			x1 = col - neighbourhood - 1
+		// 			if x1 < 0 {
+		// 				x1 = 0
+		// 			}
+		// 			if x1 >= columns {
+		// 				x1 = columns - 1
+		// 			}
+		//
+		// 			x2 = col + neighbourhood
+		// 			if x2 < 0 {
+		// 				x2 = 0
+		// 			}
+		// 			if x2 >= columns {
+		// 				x2 = columns - 1
+		// 			}
+		//
+		// 			N = IN[y2][x2] + IN[y1][x1] - IN[y1][x2] - IN[y2][x1]
+		// 			if N > 0 {
+		// 				sum = I[y2][x2] + I[y1][x1] - I[y1][x2] - I[y2][x1]
+		// 				sumSqr = I2[y2][x2] + I2[y1][x1] - I2[y1][x2] - I2[y2][x1]
+		// 				v = (sumSqr - (sum*sum)/float64(N)) / float64(N)
+		// 				if v > 0 {
+		// 					s = math.Sqrt(v)
+		// 					m = sum / float64(N)
+		// 					outValue = ((z - k) - m) / s
+		// 					if math.Abs(outValue) > maxVal[row][col] {
+		// 						maxVal[row][col] = math.Abs(outValue)
+		// 						if outValue >= 0 {
+		// 							//output.setValue(row, col, neighbourhood)
+		// 							scaleVal[row][col] = neighbourhood
+		// 						} else {
+		// 							//output.setValue(row, col, -neighbourhood)
+		// 							scaleVal[row][col] = -neighbourhood
+		// 						}
+		// 						//output2.setValue(row, col, outValue)
+		// 					}
+		// 				}
+		// 			}
+		// 		}
+		// 	}
+		// 	progress = int(100.0 * row / rowsLessOne)
+		// 	if progress != oldProgress {
+		// 		str = fmt.Sprintf("Loop %v of %v", loopNum, numLoops)
+		// 		printf("\r%s: %v%%", str, progress)
+		// 		oldProgress = progress
+		// 	}
+		// }
+
 		loopNum++
 	}
 
