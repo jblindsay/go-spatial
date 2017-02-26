@@ -4,6 +4,9 @@ import gospatial as gs
 
 def main():
     try:
+        # Get the gospatial version number
+        print(gs.version())
+
         # List all available tools in gospatial
         print(gs.list_tools())
 
@@ -16,11 +19,11 @@ def main():
         # Prints the arguments used for running the FillDepressions tool
         print(gs.tool_args("FillDepressions"))
 
-        # Sets the working directory. If the working dir is set, you don't
+        # Sets the working directory. If /the working dir is set, you don't
         # need to specify complete file names (with paths) to tools that you run.
         gs.set_working_dir("/Users/johnlindsay/Documents/data/JayStateForest")
 
-        Run the Aspect tool, specifying the arguments.
+        # Run the Aspect tool, specifying the arguments.
         name = "Aspect"
         args = [
             "DEM.dep",
@@ -40,15 +43,19 @@ def main():
 # If a callback is not provided, it will simply print the output stream.
 # A provided callback allows for custom processing of the output stream.
 def callback(s):
-    if "%" in s:
-        str_array = s.split(" ")
-        label = s.replace(str_array[len(str_array)-1], "")
-        progress = int(str_array[len(str_array)-1].replace("%", "").strip())
-        print("Progress: {}%\n".format(progress)),
-    else:
-        if "error" in s.lower():
-            print("ERROR: {}".format(s)),
+    try:
+        # print("{}".format(s))
+        if "%" in s:
+            str_array = s.split(" ")
+            label = s.replace(str_array[len(str_array)-1], "")
+            progress = int(str_array[len(str_array)-1].replace("%", "").strip())
+            print("Progress: {}%".format(progress))
         else:
-            print("{}".format(s)),
+            if "error" in s.lower():
+                print("ERROR: {}".format(s))
+            else:
+                print("{}".format(s))
+    except:
+        print(s)
 
 main()

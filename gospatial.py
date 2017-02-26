@@ -10,6 +10,13 @@ from sys import platform
 exe_path = os.path.dirname(os.path.abspath(__file__))
 wd = ""
 
+if platform == 'win32':
+    ext = '.exe'
+else:
+    ext = ''
+
+exe_name = "go-spatial{}".format(ext)
+
 def set_gospatial_dir(path):
     global exe_path
     exe_path = path
@@ -21,16 +28,10 @@ def set_working_dir(path):
 def help():
     try:
         os.chdir(exe_path)
-
-        if platform == 'win32':
-            ext = '.exe'
-        else:
-            ext = ''
-
-        exe_name = "go-spatial"
-        cmd = "." + os.path.sep + "{0}{1}".format(exe_name, ext)
-        cmd += " -help"
-        ps = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=1, universal_newlines=True)
+        cmd = []
+        cmd.append("." + os.path.sep + exe_name)
+        cmd.append("-help")
+        ps = subprocess.Popen(cmd, shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=1, universal_newlines=True)
         ret = ""
         while True:
             line = ps.stdout.readline()
@@ -40,22 +41,16 @@ def help():
                 break
 
         return ret
-    except Exception, e:
+    except Exception as e:
         return e
 
 def tool_args(tool_name):
     try:
         os.chdir(exe_path)
-
-        if platform == 'win32':
-            ext = '.exe'
-        else:
-            ext = ''
-
-        exe_name = "go-spatial"
-        cmd = "." + os.path.sep + "{0}{1}".format(exe_name, ext)
-        cmd += " -toolargs {}".format(tool_name)
-        ps = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=1, universal_newlines=True)
+        cmd = []
+        cmd.append("." + os.path.sep + exe_name)
+        cmd.append("-toolargs={}".format(tool_name))
+        ps = subprocess.Popen(cmd, shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=1, universal_newlines=True)
         ret = ""
         while True:
             line = ps.stdout.readline()
@@ -65,22 +60,16 @@ def tool_args(tool_name):
                 break
 
         return ret
-    except Exception, e:
+    except Exception as e:
         return e
 
 def tool_help(tool_name):
     try:
         os.chdir(exe_path)
-
-        if platform == 'win32':
-            ext = '.exe'
-        else:
-            ext = ''
-
-        exe_name = "go-spatial"
-        cmd = "." + os.path.sep + "{0}{1}".format(exe_name, ext)
-        cmd += " -toolhelp {}".format(tool_name)
-        ps = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=1, universal_newlines=True)
+        cmd = []
+        cmd.append("." + os.path.sep + exe_name)
+        cmd.append("-toolhelp={}".format(tool_name))
+        ps = subprocess.Popen(cmd, shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=1, universal_newlines=True)
         ret = ""
         while True:
             line = ps.stdout.readline()
@@ -90,22 +79,16 @@ def tool_help(tool_name):
                 break
 
         return ret
-    except Exception, e:
+    except Exception as e:
         return e
 
 def list_tools():
     try:
         os.chdir(exe_path)
-
-        if platform == 'win32':
-            ext = '.exe'
-        else:
-            ext = ''
-
-        exe_name = "go-spatial"
-        cmd = "." + os.path.sep + "{0}{1}".format(exe_name, ext)
-        cmd += " -listtools"
-        ps = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=1, universal_newlines=True)
+        cmd = []
+        cmd.append("." + os.path.sep + exe_name)
+        cmd.append("-listtools")
+        ps = subprocess.Popen(cmd, shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=1, universal_newlines=True)
         ret = ""
         while True:
             line = ps.stdout.readline()
@@ -115,7 +98,7 @@ def list_tools():
                 break
 
         return ret
-    except Exception, e:
+    except Exception as e:
         return e
 
 def default_callback(str):
@@ -124,25 +107,38 @@ def default_callback(str):
 def run_tool(tool_name, args, callback = default_callback):
     try:
         os.chdir(exe_path)
-
-        if platform == 'win32':
-            ext = '.exe'
-        else:
-            ext = ''
-
-        exe_name = "go-spatial"
-        cmd = "." + os.path.sep + "{0}{1}".format(exe_name, ext)
+        cmd = []
+        cmd.append("." + os.path.sep + exe_name)
         if len(wd) > 0:
-            cmd += " -cwd {}".format(wd)
+            cmd.append("-cwd=\"{}\"".format(wd))
 
-        cmd += ' -run \"{}\"'.format(tool_name)
+        cmd.append("-run={}".format(tool_name))
         args_str = ""
         for s in args:
             args_str += s.replace("\"", "") + ";"
         args_str = args_str[:-1]
-        cmd += ' -args \"{}\"'.format(args_str)
+        cmd.append("-args=\"{}\"".format(args_str))
         # print cmd
-        ps = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=1, universal_newlines=True)
+        ps = subprocess.Popen(cmd, shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=1, universal_newlines=True)
+
+        # if platform == 'win32':
+        #     ext = '.exe'
+        # else:
+        #     ext = ''
+        #
+        # exe_name = "go-spatial"
+        # cmd = "." + os.path.sep + exe_name #"{0}{1}".format(exe_name, ext)
+        # if len(wd) > 0:
+        #     cmd += " -cwd {}".format(wd)
+        #
+        # cmd += ' -run \"{}\"'.format(tool_name)
+        # args_str = ""
+        # for s in args:
+        #     args_str += s.replace("\"", "") + ";"
+        # args_str = args_str[:-1]
+        # cmd += ' -args \"{}\"'.format(args_str)
+        # # print cmd
+        # ps = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=1, universal_newlines=True)
 
         while True:
             line = ps.stdout.readline()
@@ -152,6 +148,25 @@ def run_tool(tool_name, args, callback = default_callback):
                 break
 
         return 0
-    except Exception, e:
+    except Exception as e:
+        print(e)
         return 1
-        print e
+
+def version():
+    try:
+        os.chdir(exe_path)
+        cmd = []
+        cmd.append("." + os.path.sep + exe_name)
+        cmd.append("-version")
+        ps = subprocess.Popen(cmd, shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, bufsize=1, universal_newlines=True)
+        ret = ""
+        while True:
+            line = ps.stdout.readline()
+            if line != '':
+                ret += line
+            else:
+                break
+
+        return ret
+    except Exception as e:
+        return e

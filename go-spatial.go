@@ -54,9 +54,19 @@ func main() {
 	flag.StringVar(&toolArgsStr, "toolargs", "", "Prints details about the arguments for a tool")
 	var helpArg = false
 	flag.BoolVar(&helpArg, "help", false, "Help")
-	var ldflags string
-	flag.StringVar(&ldflags, "ldflags", "", "ldflags")
+	// var ldflags string
+	// flag.StringVar(&ldflags, "ldflags", "", "ldflags")
+	var versionFlag = false
+	flag.BoolVar(&versionFlag, "version", false, "Version number")
 	flag.Parse()
+
+	if strings.Contains(cwd, "\"") {
+		cwd = strings.Replace(cwd, "\"", "", -1)
+	}
+
+	if strings.Contains(runTool, "\"") {
+		runTool = strings.Replace(runTool, "\"", "", -1)
+	}
 
 	//	if flagCpuprofile != "" {
 	//		f, err := os.Create(flagCpuprofile)
@@ -72,13 +82,19 @@ func main() {
 		if cmd, ok := commandMap["listtools"]; ok {
 			cmd()
 		} else {
-			printerr(fmt.Errorf("Unrecognized command '%s', type 'help' for details...", commandArgs[0]))
+			printerr(fmt.Errorf("unrecognized command '%s', type 'help' for details...", commandArgs[0]))
+		}
+	} else if versionFlag {
+		if cmd, ok := commandMap["version"]; ok {
+			cmd()
+		} else {
+			printerr(fmt.Errorf("unrecognized command '%s', type 'help' for details...", commandArgs[0]))
 		}
 	} else if helpArg {
 		if cmd, ok := commandMap["help"]; ok {
 			cmd()
 		} else {
-			printerr(fmt.Errorf("Unrecognized command '%s', type 'help' for details...", commandArgs[0]))
+			printerr(fmt.Errorf("unrecognized command '%s', type 'help' for details...", commandArgs[0]))
 		}
 	} else if toolHelp != "" {
 		commandArgs = []string{"toolhelp", toolHelp}
@@ -102,6 +118,7 @@ func main() {
 		//		var cwd string
 		//		flag.StringVar(&cwd, "cwd", "", "Change the working directory")
 		//		flag.Parse()
+		// fmt.Println(runTool)
 		if len(strings.TrimSpace(cwd)) > 0 {
 			changeWorkingDirectory(cwd)
 		}
@@ -141,7 +158,7 @@ func main() {
 				if cmd, ok := commandMap[strings.ToLower(commandArgs[0])]; ok {
 					cmd()
 				} else {
-					printerr(fmt.Errorf("Unrecognized command '%s', type 'help' for details...", commandArgs[0]))
+					printerr(fmt.Errorf("unrecognized command '%s', type 'help' for details...", commandArgs[0]))
 				}
 			} else {
 				printErrString("Empty command, type 'help' for details...")
