@@ -5,33 +5,34 @@ import gospatial as gs
 def main():
     try:
         # Get the gospatial version number
-        print(gs.version())
+        # print(gs.version())
 
         # List all available tools in gospatial
-        print(gs.list_tools())
+        # print(gs.list_tools())
 
         # Prints the gospatial help...a listing of available commands
-        print(gs.help())
+        # print(gs.help())
 
         # Print the help documentation for the Aspect tool
-        print(gs.tool_help("Aspect"))
+        # print(gs.tool_help("MaxElevationDeviation"))
 
         # Prints the arguments used for running the FillDepressions tool
-        print(gs.tool_args("FillDepressions"))
+        # print(gs.tool_args("FillDepressions"))
 
         # Sets the working directory. If /the working dir is set, you don't
         # need to specify complete file names (with paths) to tools that you run.
-        gs.set_working_dir("/Users/johnlindsay/Documents/data/JayStateForest")
+        gs.set_working_dir("/Users/johnlindsay/Documents/data/")
 
         # Run the Aspect tool, specifying the arguments.
-        name = "Aspect"
+        name = "DeviationFromMean"
         args = [
-            "DEM.dep",
-            "aspect.dep"
+            "gtopo30_arab_subduction.dep",
+            "out4.dep",
+            "100"
         ]
 
         # Run the tool and check the return value
-        ret = gs.run_tool(name, args, callback)
+        ret = gs.run_tool(name, args)
         if ret != 0:
             print("ERROR: return value={}".format(ret))
 

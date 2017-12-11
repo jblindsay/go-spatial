@@ -326,7 +326,7 @@ func (this *BreachDepressions) Run() {
 	paletteName := demConfig.PreferredPalette
 	minVal := dem.GetMinimumValue()
 	elevDigits := len(strconv.Itoa(int(dem.GetMaximumValue() - minVal)))
-	elevMultiplier := math.Pow(10, float64(8-elevDigits))
+	elevMultiplier := math.Pow(10, float64(5-elevDigits))
 	SMALL_NUM := 1 / elevMultiplier * 10
 	POS_INF := math.Inf(1)
 

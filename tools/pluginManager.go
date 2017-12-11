@@ -82,7 +82,6 @@ func (ptm *PluginToolManager) InitializeTools() {
 
 	mf := new(MeanFilter)
 	ptm.mapOfPluginTools[strings.ToLower(mf.GetName())] = mf
-
 }
 
 func (ptm *PluginToolManager) GetListOfTools() []PluginTool {

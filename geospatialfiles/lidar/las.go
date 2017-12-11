@@ -74,13 +74,14 @@ func (las *LasFile) readPointData() {
 			panic(errors.New("Error reading point data"))
 		}
 	}
-
 }
 
+// GetFileName Returns the file name
 func (las *LasFile) GetFileName() string {
 	return las.fileName
 }
 
+// GetPointXYZ returns the x,y,z coordinates of a point
 func (las *LasFile) GetPointXYZ(n int64) (X, Y, Z float64) {
 	if las.pointData == nil {
 		las.readPointData()
@@ -91,6 +92,7 @@ func (las *LasFile) GetPointXYZ(n int64) (X, Y, Z float64) {
 	return X, Y, Z
 }
 
+// GetPointIntensity returns the intensity associated with a point
 func (las *LasFile) GetPointIntensity(n int64) uint16 {
 	if las.pointData == nil {
 		las.readPointData()
@@ -98,6 +100,7 @@ func (las *LasFile) GetPointIntensity(n int64) uint16 {
 	return las.pointData[n].Intensity
 }
 
+// GetPointClassValue returns class value information for a point
 func (las *LasFile) GetPointClassValue(n int64) byte {
 	if las.pointData == nil {
 		las.readPointData()
@@ -105,6 +108,7 @@ func (las *LasFile) GetPointClassValue(n int64) byte {
 	return las.pointData[n].ClassField.ClassValue()
 }
 
+// GetPointClassName returns the class name associated with a point
 func (las *LasFile) GetPointClassName(n int64) string {
 	if las.pointData == nil {
 		las.readPointData()
@@ -112,6 +116,7 @@ func (las *LasFile) GetPointClassName(n int64) string {
 	return las.pointData[n].ClassField.ClassString()
 }
 
+// PrintPointData prints data for a point
 func (las *LasFile) PrintPointData(n int64) {
 	if las.pointData == nil {
 		las.readPointData()
@@ -119,6 +124,7 @@ func (las *LasFile) PrintPointData(n int64) {
 	println(las.pointData[n].String())
 }
 
+// Close closes a LasFile
 func (las *LasFile) Close() error {
 	return las.r.Close()
 }
