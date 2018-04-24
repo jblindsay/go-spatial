@@ -4,11 +4,11 @@
 
 This project was developed during a period when I was experimenting with different alternatives to Java for developing Whitebox GAT. I have now settled on the Rust programming language for future development efforts. The tools that are contained within the GoSpatial codebase have since been ported to [WhiteboxTools](http://www.uoguelph.ca/~hydrogeo/WhiteboxTools/index.html). This project is being maintained for archival purposes only.
 
-##Description
+## Description
 
 GoSpatial is a command-line interface program for analyzing and manipulating geospatial data. It has been developed by [John Lindsay](http://www.uoguelph.ca/geography/faculty/lindsay-john "John Lindsay's homepage") using the [Go](https://golang.org "Go programming language homepage") programming language and is compiled to native code. The project is experimental and is intended to provide additional analytical support for the [Whitebox Geospatial Analysis Tools](http://www.uoguelph.ca/~hydrogeo/Whitebox/ "Whitebox GAT homepage") open-source GIS software. GoSpatial can however run completely independently of any other software. Visit the GoSpatial homepage [here](http://www.uoguelph.ca/~hydrogeo/software.shtml).
 
-##Install
+## Install
 
 To install the GoSpatial source code using the ```go get``` tool within the terminal, simply type:
 
@@ -20,9 +20,9 @@ You may then build an executable file using the ```go build``` tool. Alternative
 
 **Pre-compiled versions** of the GoSpatial executable are available for various supported platforms and are distributed from the [Centre for Hydrogeomatics](http://www.uoguelph.ca/~hydrogeo/software.shtml "Centre for Hydrogeomatics homepage") homepage.
 
-##Usage
+## Usage
 
-###Getting help
+### Getting help
 
 To print a list of commands for GoSpatial, simply use the ```help``` command:
 
@@ -56,7 +56,7 @@ Please enter a command:
 
 The most common command that you will use is the ```run``` command.
 
-###Working directories
+### Working directories
 To print the current working directory, use the ```pwd``` command:
 ```
 Please enter a command: pwd
@@ -68,7 +68,7 @@ To change the working directory, use the ```cwd``` command:
 Please enter a command: cwd /Users/johnlinsay/Documents/data
 ```
 
-###Tools
+### Tools
 
 To print a list of available tools, use the ```listtools``` command:
 ```
@@ -130,7 +130,7 @@ Elapsed time (total): 6.087567077s
 $
 ```
 
-###Calling GoSpatial tools from a script
+### Calling GoSpatial tools from a script
 
 Sometimes you need to call a GoSpatial tool in an automated fashion, rather than using the GoSpatial command-line interface. Here is an example (*gospatial_example.py* in source folder) of interacting with the GoSpatial library from a Python script:
 
@@ -207,6 +207,6 @@ p.wait()
 print("Done!")
 ``` -->
 
-##License
+## License
 
 GoSpatial is distributed under the [MIT open-source license](./LICENSE).
