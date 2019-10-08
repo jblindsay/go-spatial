@@ -127,7 +127,7 @@ func main() {
 		if len(toolArgs) > 0 {
 			// parse the args
 			f := func(c rune) bool {
-				return !unicode.IsLetter(c) && !unicode.IsNumber(c) && c != '.' && c != os.PathSeparator && c != ' ' && c != '-' && c != '_'
+				return !unicode.IsLetter(c) && !unicode.IsNumber(c) && c != '.' && c != os.PathSeparator && c != ' ' && c != '-' && c != '_' && c != ':'
 			}
 			argsArray = strings.FieldsFunc(toolArgs, f)
 		}
@@ -272,7 +272,7 @@ func init() {
 			s = strings.TrimSpace(s)
 			// parse the args
 			f := func(c rune) bool {
-				return !unicode.IsLetter(c) && !unicode.IsNumber(c) && c != '.' && c != os.PathSeparator && c != ' ' && c != '-'
+				return !unicode.IsLetter(c) && !unicode.IsNumber(c) && c != '.' && c != os.PathSeparator && c != ' ' && c != '-' && c != '_' && c != ':'
 			}
 			argsArray := strings.FieldsFunc(s, f)
 
